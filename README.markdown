@@ -24,8 +24,27 @@ To put your changes to an ActiveRecord class into Purgatory, simply make your ch
 
 To apply the changes, simply call the approve! method on the associated Pergatory instance, passing in the approving user as a parameter
 
-    purgatory = Purgatory.where(soul_id: 10, soul_type: 'Item')
+    purgatory = item.purgatories.last
     purgatory.approve!(current_user)
+
+The following are the attributes of a purgatory:
+
+    purgatory.soul # The ActiveRecord model instance whose changes are in purgatory
+    purgatory.requester # The user who created the purgatory
+    purgatory.created_at # The time when the purgatory was created
+    purgatory.approver # The user who approved the purgatory
+    purgatory.approved_at # The time when the purgatory was approved
+
+Here are some handy scopes and methods available to you:
+
+    ### Scopes
+    Purgatory.pending # Returns a relation of all pending purgatories
+    Purgatory.approved # Returns a relation of all approved purgatories
+
+    ### Methods
+    purgatory.pending? # Returns true if the purgatory is pending, false otherwise
+    purgatory.approved? # Returns true if the purgatory has been approved, false otherwise
+    purgatory.changes_hash # Returns a hash of the proposed changes. The keys are the attribute names and the values are 2-element arrays where the 1st element is the old value and the 2nd element is the new value
 
 ## Contributing to Purgatory
  

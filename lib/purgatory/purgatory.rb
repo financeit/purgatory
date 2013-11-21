@@ -8,6 +8,17 @@ class Purgatory < ActiveRecord::Base
 
   validates :soul, :requester, presence: true
 
+  scope :pending, conditions: { approved_at: nil }
+  scope :approved, conditions: ["approved_at IS NOT NULL"]
+
+  def approved?
+    approved_at.present?
+  end
+
+  def pending?
+    approved_at.nil?
+  end
+
   def changes_hash
     ActiveSupport::JSON.decode(changes_json)
   end
