@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
     "lib/purgatory.rb",
     "lib/purgatory/purgatory.rb",
     "lib/purgatory/purgatory_module.rb",
+    "purgatory.gemspec",
     "test/helper.rb",
     "test/test_purgatory.rb"
   ]
