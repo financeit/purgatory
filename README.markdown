@@ -27,7 +27,7 @@ To apply the changes, simply call the approve! method on the associated Pergator
     purgatory = item.purgatories.last
     purgatory.approve!(current_user)
 
-The following are the attributes of a purgatory:
+The following are some attributes of a purgatory:
 
     purgatory.soul # The ActiveRecord model instance whose changes are in purgatory
     purgatory.requester # The user who created the purgatory
