@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Elan Dubrofsky"]
-  s.date = "2013-11-21"
+  s.date = "2013-11-22"
   s.description = "Put your model changes in purgatory and allow them to remain lost souls until they are approved"
   s.email = "elan.dubrofsky@gmail.com"
   s.extra_rdoc_files = [
@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
     "test/helper.rb",
     "test/test_purgatory.rb"
   ]
-  s.homepage = "http://github.com/dubroe/purgatory"
+  s.homepage = "http://github.com/financeit/purgatory"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "2.1.10"
