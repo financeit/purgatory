@@ -1,7 +1,7 @@
 class Purgatory < ActiveRecord::Base
   attr_accessible :requester, :soul
 
-  belongs_to :soul, polymorphic: true
+  belongs_to :soul, polymorphic: true, autosave: false
   belongs_to :requester, class_name: 'User'
   belongs_to :approver, class_name: 'User'
   before_create :store_changes
@@ -26,6 +26,9 @@ class Purgatory < ActiveRecord::Base
   def approve!(approver)
     return if approved_at.present?
     changes = changes_hash
+
+    soul = soul_type.constantize.new unless soul.present?
+
     if soul.update_attributes(changes.update(changes){|k,v| v.last}, without_protection: true)
       self.approver = approver
       self.approved_at = Time.now
