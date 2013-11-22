@@ -24,13 +24,15 @@ class Purgatory < ActiveRecord::Base
   end
 
   def approve!(approver)
-    return if approved_at.present?
+    return false if approved?
     changes = changes_hash
     if soul.update_attributes(changes.update(changes){|k,v| v.last}, without_protection: true)
       self.approver = approver
       self.approved_at = Time.now
       save
+      return true
     end
+    false
   end
 
   private

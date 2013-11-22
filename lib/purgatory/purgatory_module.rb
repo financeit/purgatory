@@ -8,6 +8,7 @@ module PurgatoryModule
   end
 
   def purgatory!(requester)
+    return nil if self.invalid?
     Purgatory.create soul: self, requester: requester
   end
 end
