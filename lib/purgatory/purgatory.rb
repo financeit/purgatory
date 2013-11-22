@@ -24,7 +24,7 @@ class Purgatory < ActiveRecord::Base
   end
 
   def approve!(approver)
-    return if approved_at.present?
+    return false if approved?
     changes = changes_hash
 
     soul = soul_type.constantize.new unless soul.present?
@@ -33,7 +33,9 @@ class Purgatory < ActiveRecord::Base
       self.approver = approver
       self.approved_at = Time.now
       save
+      return true
     end
+    false
   end
 
   private
