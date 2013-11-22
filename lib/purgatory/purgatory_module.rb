@@ -7,7 +7,7 @@ module PurgatoryModule
     end
   end
 
-  def purgatory!(requester)
+  def purgatory!(requester = nil)
     return nil if self.invalid?
     Purgatory.create soul: self, requester: requester
   end

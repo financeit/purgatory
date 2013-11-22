@@ -6,7 +6,7 @@ class Purgatory < ActiveRecord::Base
   belongs_to :approver, class_name: 'User'
   before_create :store_changes
 
-  validates :soul_type, :requester_id, presence: true
+  validates :soul_type, presence: true
 
   scope :pending, conditions: { approved_at: nil }
   scope :approved, conditions: ["approved_at IS NOT NULL"]
@@ -23,11 +23,13 @@ class Purgatory < ActiveRecord::Base
     ActiveSupport::JSON.decode(changes_json)
   end
 
-  def approve!(approver)
+  def soul
+    super || soul_type.constantize.new
+  end
+
+  def approve!(approver = nil)
     return false if approved?
     changes = changes_hash
-
-    soul = soul_type.constantize.new unless soul.present?
 
     if soul.update_attributes(changes.update(changes){|k,v| v.last}, without_protection: true)
       self.approver = approver
