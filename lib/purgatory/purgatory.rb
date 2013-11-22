@@ -6,7 +6,7 @@ class Purgatory < ActiveRecord::Base
   belongs_to :approver, class_name: 'User'
   before_create :store_changes
 
-  validates :soul, :requester, presence: true
+  validates :soul_type, :requester_id, presence: true
 
   scope :pending, conditions: { approved_at: nil }
   scope :approved, conditions: ["approved_at IS NOT NULL"]
