@@ -15,7 +15,7 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "purgatory"
-  gem.homepage = "http://github.com/dubroe/purgatory"
+  gem.homepage = "http://github.com/financeit/purgatory"
   gem.license = "MIT"
   gem.summary = %Q{Allow changes to a model to be put in purgatory until they are approved}
   gem.description = %Q{Put your model changes in purgatory and allow them to remain lost souls until they are approved}
