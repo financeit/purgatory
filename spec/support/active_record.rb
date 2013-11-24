@@ -1,4 +1,5 @@
 require 'active_record'
+require 'generators/purgatory/templates/create_purgatories'
 
 ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
 
@@ -7,17 +8,7 @@ ActiveRecord::Migration.create_table :widgets do |t|
   t.timestamps
 end
 
-
-ActiveRecord::Migration.create_table :purgatories do |t|
-  t.integer :soul_id
-  t.string :soul_type
-  t.integer :requester_id
-  t.integer :approver_id
-  t.datetime :approved_at
-  t.string :changes_json
-
-  t.timestamps
-end
+CreatePurgatories.new.migrate(:up)
 
 RSpec.configure do |config|
   config.around do |example|
