@@ -1,6 +1,4 @@
 class Purgatory < ActiveRecord::Base
-  attr_accessible :requester, :soul
-
   belongs_to :soul, polymorphic: true, autosave: false
   belongs_to :requester, class_name: 'User'
   belongs_to :approver, class_name: 'User'
@@ -8,8 +6,13 @@ class Purgatory < ActiveRecord::Base
 
   validates :soul_type, presence: true
 
-  scope :pending, conditions: { approved_at: nil }
-  scope :approved, conditions: ["approved_at IS NOT NULL"]
+  def self.pending
+    where(approved_at: nil)
+  end
+  
+  def self.approved
+    where ["approved_at IS NOT NULL"]
+  end
 
   def approved?
     approved_at.present?
