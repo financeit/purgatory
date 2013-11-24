@@ -9,15 +9,8 @@ describe Purgatory do
   context :purgatory! do
     context "putting object changes into purgatory" do
       context "valid changes" do
-        before(:each) do          
-          @widget = Widget.create name: 'foo', price: 100
-          @widget.name = 'bar'
-          @widget.price = 200
-          @purgatory = @widget.purgatory! user1
-          @widget.reload
-          @purgatory.reload
-        end
-    
+        before {create_object_change_purgatory}
+        
         it "should create and return pending Purgatory object" do
           @purgatory.should be_present
           @purgatory.should_not be_approved
@@ -59,11 +52,7 @@ describe Purgatory do
     
     context "putting new object creation into purgatory" do
       context "valid object" do
-        before(:each) do
-          widget = Widget.new name: 'foo', price: 100
-          @purgatory = widget.purgatory! user1
-          @purgatory.reload
-        end
+        before {create_new_object_purgatory}
     
         it "should create and return pending Purgatory object" do
           @purgatory.should be_present
@@ -78,8 +67,6 @@ describe Purgatory do
           widget = @purgatory.soul
           widget.class.should == Widget
           widget.should be_new_record
-          widget.name.should be_blank
-          widget.price.should be_blank
         end
         
         it "should store the requester and requested changes" do
@@ -102,5 +89,78 @@ describe Purgatory do
         Widget.count.should be_zero
       end
     end
+  end
+  
+  context :approve! do
+    context "approving object change purgatory" do
+      before do
+        create_object_change_purgatory
+        @purgatory.approve!(user2).should be_true
+        @widget.reload
+      end
+      
+      it "should apply the changes" do
+        @widget.name.should == 'bar'
+        @widget.price.should == 200
+      end
+      
+      it "should mark purgatory as approved and store approver" do
+        @purgatory.approver.should == user2
+        @purgatory.should be_approved
+        @purgatory.should_not be_pending            
+        Purgatory.pending.count.should be_zero
+        Purgatory.approved.count.should == 1
+        Purgatory.approved.first.should == @purgatory
+      end
+      
+      it "should fail if you try to approve again" do
+        @purgatory.approve!(user2).should be_false
+      end
+    end
+    
+    context "approving new object creation" do
+      before do
+        create_new_object_purgatory
+        @purgatory.approve!(user2).should be_true
+      end
+      
+      it "should create the new object and apply any callbacks" do
+        Widget.count.should == 1
+        widget = Widget.first
+        widget.name.should == 'foo'
+        widget.price.should == 100
+        widget.original_name.should == 'foo'
+      end
+      
+      it "should mark purgatory as approved and store approver" do
+        @purgatory.approver.should == user2
+        @purgatory.should be_approved
+        @purgatory.should_not be_pending            
+        Purgatory.pending.count.should be_zero
+        Purgatory.approved.count.should == 1
+        Purgatory.approved.first.should == @purgatory
+      end
+      
+      it "should fail if you try to approve again" do
+        @purgatory.approve!(user2).should be_false
+      end
+    end
+  end
+  
+  private
+  
+  def create_object_change_purgatory
+    @widget = Widget.create name: 'foo', price: 100
+    @widget.name = 'bar'
+    @widget.price = 200
+    @purgatory = @widget.purgatory! user1
+    @widget.reload
+    @purgatory.reload
+  end
+  
+  def create_new_object_purgatory
+    widget = Widget.new name: 'foo', price: 100
+    @purgatory = widget.purgatory! user1
+    @purgatory.reload
   end
 end

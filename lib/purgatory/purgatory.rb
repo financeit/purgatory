@@ -27,14 +27,13 @@ class Purgatory < ActiveRecord::Base
   end
 
   def soul
-    super || soul_type.constantize.new
+    @soul ||= (super || soul_type.constantize.new)
   end
 
   def approve!(approver = nil)
     return false if approved?
-    changes = changes_hash
-
-    if soul.update_attributes(changes.update(changes){|k,v| v.last}, without_protection: true)
+    changes_hash.each{|k,v| soul.send "#{k}=", v[1]}
+    if soul.save
       self.approver = approver
       self.approved_at = Time.now
       save
