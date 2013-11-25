@@ -11,4 +11,19 @@ module PurgatoryModule
     return nil if self.invalid?
     Purgatory.create soul: self, requester: requester
   end
+
+  class Configuration
+    attr_accessor :user_class_name
+  end
+
+  class << self
+    def configure(&block)
+      yield(configuration)
+      configuration
+    end
+
+    def configuration
+      @_configuration ||= Configuration.new
+    end
+  end
 end

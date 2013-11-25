@@ -4,13 +4,15 @@ Purgatory allows you to put changes to an ActiveRecord model into purgatory unti
 
 ## How to Use
 
-First run the generator the create the required migrations:
+First run the generator the create the required migration and initializer file:
 
     $ rails generate purgatory
 
 Then migrate the database:
 
     $ rake db:migrate
+
+By default the class of a purgatory's requester and approver is assumed to be 'User'. You can configure this in the config/initializers/purgatory file.
 
 To enable Purgatory functionality in a class, add the following line to the class:
 

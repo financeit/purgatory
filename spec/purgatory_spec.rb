@@ -1,7 +1,7 @@
 require 'support/active_record'
 require 'support/widget'
 require 'support/user'
-require 'purgatory'
+require 'purgatory/purgatory'
 
 describe Purgatory do
   let(:user1) {User.create name: 'Elan'}

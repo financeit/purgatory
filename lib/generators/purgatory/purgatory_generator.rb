@@ -19,4 +19,14 @@ class PurgatoryGenerator < Rails::Generators::Base
   def create_migration_file
     migration_template 'create_purgatories.rb', 'db/migrate/create_purgatories.rb'
   end
+
+  def create_initializer_file
+    create_file 'config/initializers/purgatory.rb', <<-eos
+PurgatoryModule.configure do |config|
+  config.user_class_name = 'User'
+end
+
+require 'purgatory/purgatory'
+    eos
+  end
 end

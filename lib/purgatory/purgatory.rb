@@ -1,7 +1,9 @@
+require 'purgatory/purgatory_module'
+
 class Purgatory < ActiveRecord::Base
   belongs_to :soul, polymorphic: true, autosave: false
-  belongs_to :requester, class_name: 'User'
-  belongs_to :approver, class_name: 'User'
+  belongs_to :requester, class_name: PurgatoryModule.configuration.user_class_name
+  belongs_to :approver, class_name: PurgatoryModule.configuration.user_class_name
   before_create :store_changes
 
   validates :soul_type, presence: true

@@ -1,5 +1,6 @@
 require 'active_record'
 require 'generators/purgatory/templates/create_purgatories'
+require 'purgatory/purgatory_module'
 
 ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
 
@@ -16,6 +17,10 @@ ActiveRecord::Migration.create_table :users do |t|
 end
 
 CreatePurgatories.new.migrate(:up)
+
+PurgatoryModule.configure do |config|
+  config.user_class_name = 'User'
+end
 
 RSpec.configure do |config|
   config.around do |example|
