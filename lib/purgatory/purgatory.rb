@@ -6,6 +6,8 @@ class Purgatory < ActiveRecord::Base
 
   validates :soul_type, presence: true
 
+  serialize :requested_changes
+
   def self.pending
     where(approved_at: nil)
   end
@@ -22,17 +24,13 @@ class Purgatory < ActiveRecord::Base
     approved_at.nil?
   end
 
-  def changes_hash
-    ActiveSupport::JSON.decode(changes_json)
-  end
-
   def soul
     @soul ||= (super || soul_type.constantize.new)
   end
 
   def approve!(approver = nil)
     return false if approved?
-    changes_hash.each{|k,v| soul.send "#{k}=", v[1]}
+    requested_changes.each{|k,v| soul.send "#{k}=", v[1]}
     if soul.save
       self.approver = approver
       self.approved_at = Time.now
@@ -45,6 +43,6 @@ class Purgatory < ActiveRecord::Base
   private
 
   def store_changes
-    self.changes_json = ActiveSupport::JSON.encode(soul.changes)
+    self.requested_changes = soul.changes
   end
 end

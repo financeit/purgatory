@@ -6,7 +6,7 @@ class CreatePurgatories < ActiveRecord::Migration
       t.integer :requester_id
       t.integer :approver_id
       t.datetime :approved_at
-      t.string :changes_json
+      t.string :requested_changes
 
       t.timestamps
     end

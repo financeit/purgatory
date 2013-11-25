@@ -37,6 +37,7 @@ The following are some attributes of a purgatory:
     purgatory.soul # The ActiveRecord model instance whose changes are in purgatory
     purgatory.requester # The user who created the purgatory
     purgatory.created_at # The time when the purgatory was created
+    purgatory.requested_changes # A hash of the proposed changes. The keys are the attribute names and the values are 2-element arrays where the 1st element is the old value and the 2nd element is the new value
     purgatory.approver # The user who approved the purgatory
     purgatory.approved_at # The time when the purgatory was approved
 
@@ -49,7 +50,6 @@ Here are some handy scopes and methods available to you:
     ### Methods
     purgatory.pending? # Returns true if the purgatory is pending, false otherwise
     purgatory.approved? # Returns true if the purgatory has been approved, false otherwise
-    purgatory.changes_hash # Returns a hash of the proposed changes. The keys are the attribute names and the values are 2-element arrays where the 1st element is the old value and the 2nd element is the new value
 
 ## Contributing to Purgatory
  

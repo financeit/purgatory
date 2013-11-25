@@ -23,10 +23,10 @@ describe Purgatory do
         it "should store the soul, requester and requested changes" do
           @purgatory.soul.should == @widget
           @purgatory.requester.should == user1
-          @purgatory.changes_hash['name'].first.should == 'foo'
-          @purgatory.changes_hash['name'].last.should == 'bar'
-          @purgatory.changes_hash['price'].first.should == 100
-          @purgatory.changes_hash['price'].last.should == 200
+          @purgatory.requested_changes['name'].first.should == 'foo'
+          @purgatory.requested_changes['name'].last.should == 'bar'
+          @purgatory.requested_changes['price'].first.should == 100
+          @purgatory.requested_changes['price'].last.should == 200
         end
     
         it "should not change the widget" do
@@ -71,10 +71,10 @@ describe Purgatory do
         
         it "should store the requester and requested changes" do
           @purgatory.requester.should == user1
-          @purgatory.changes_hash['name'].first.should == nil
-          @purgatory.changes_hash['name'].last.should == 'foo'
-          @purgatory.changes_hash['price'].first.should == nil
-          @purgatory.changes_hash['price'].last.should == 100
+          @purgatory.requested_changes['name'].first.should == nil
+          @purgatory.requested_changes['name'].last.should == 'foo'
+          @purgatory.requested_changes['price'].first.should == nil
+          @purgatory.requested_changes['price'].last.should == 100
         end
     
         it "should not create a widget" do
