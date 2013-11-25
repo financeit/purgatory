@@ -16,6 +16,14 @@ ActiveRecord::Migration.create_table :users do |t|
   t.timestamps
 end
 
+ActiveRecord::Migration.create_table :animals do |t|
+  t.string :name
+  t.string :type
+  t.integer :price 
+  t.string :original_name 
+  t.timestamps
+end
+
 CreatePurgatories.new.migrate(:up)
 
 PurgatoryModule.configure do |config|

@@ -27,7 +27,12 @@ class Purgatory < ActiveRecord::Base
   end
 
   def soul
-    @soul ||= (super || soul_type.constantize.new)
+    @soul ||= (super || 
+               (sti_class || soul_type).constantize.new)
+  end
+
+  def sti_class
+    requested_changes[:type].try(:last)
   end
 
   def approve!(approver = nil)

@@ -1,6 +1,7 @@
 require 'support/active_record'
 require 'support/widget'
 require 'support/user'
+require 'support/animal'
 require 'purgatory/purgatory'
 
 describe Purgatory do
@@ -81,6 +82,35 @@ describe Purgatory do
           Widget.count.should be_zero
         end
       end
+
+      context "valid object using STI (single table inheritance)" do
+        before {create_new_object_purgatory_with_sti}
+    
+        it "should create and return pending Purgatory object" do
+          @purgatory.should be_present
+          @purgatory.should_not be_approved
+          @purgatory.should be_pending            
+          Purgatory.pending.count.should == 1
+          Purgatory.pending.first.should == @purgatory
+          Purgatory.approved.count.should be_zero            
+        end
+        
+        it "should return the soul as a new instance of the purgatoried class" do
+          dog = @purgatory.soul
+          dog.class.should == Dog
+          dog.should be_new_record
+        end
+        
+        it "should store the requester and requested changes" do
+          @purgatory.requester.should == user1
+          @purgatory.requested_changes['name'].first.should == nil
+          @purgatory.requested_changes['name'].last.should == 'doggy'
+        end
+    
+        it "should not create a dog" do
+          Dog.count.should be_zero
+        end
+      end
     
       it "should not allow invalid object creation to be put into purgatory" do
         widget = Widget.new name: ''
@@ -145,6 +175,34 @@ describe Purgatory do
         @purgatory.approve!(user2).should be_false
       end
     end
+
+    context "approving new object creation using STI" do
+      before do
+        create_new_object_purgatory_with_sti
+        @purgatory.approve!(user2).should be_true
+      end
+      
+      it "should create the new object and apply any callbacks" do
+        Dog.count.should == 1
+        dog = Dog.first
+        dog.name.should == 'doggy'
+        dog.original_name.should == 'doggy'
+        dog.price.should == Dog::DEFAULT_PRICE
+      end
+
+      it "should mark purgatory as approved and store approver" do
+        @purgatory.approver.should == user2
+        @purgatory.should be_approved
+        @purgatory.should_not be_pending            
+        Purgatory.pending.count.should be_zero
+        Purgatory.approved.count.should == 1
+        Purgatory.approved.first.should == @purgatory
+      end
+      
+      it "should fail if you try to approve again" do
+        @purgatory.approve!(user2).should be_false
+      end
+    end
   end
   
   private
@@ -163,4 +221,11 @@ describe Purgatory do
     purgatory = widget.purgatory! user1
     @purgatory = Purgatory.find(purgatory.id)
   end
+
+  def create_new_object_purgatory_with_sti
+    dog = Dog.new name: 'doggy'
+    purgatory = dog.purgatory! user1
+    @purgatory = Purgatory.find(purgatory.id)
+  end
+  
 end
