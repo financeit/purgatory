@@ -153,14 +153,14 @@ describe Purgatory do
     @widget = Widget.create name: 'foo', price: 100
     @widget.name = 'bar'
     @widget.price = 200
-    @purgatory = @widget.purgatory! user1
+    purgatory = @widget.purgatory! user1
+    @purgatory = Purgatory.find(purgatory.id)
     @widget.reload
-    @purgatory.reload
   end
   
   def create_new_object_purgatory
     widget = Widget.new name: 'foo', price: 100
-    @purgatory = widget.purgatory! user1
-    @purgatory.reload
+    purgatory = widget.purgatory! user1
+    @purgatory = Purgatory.find(purgatory.id)
   end
 end
