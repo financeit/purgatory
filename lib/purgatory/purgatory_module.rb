@@ -7,8 +7,9 @@ module PurgatoryModule
     end
   end
 
-  def purgatory!(requester = nil)
+  def purgatory!(requester = nil, options = {})
     return nil if self.invalid?
+    return nil if Purgatory.pending_with_matching_soul(self).any? && options[:fail_if_matching_soul]
     Purgatory.create soul: self, requester: requester
   end
 

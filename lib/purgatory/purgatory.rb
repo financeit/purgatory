@@ -5,6 +5,7 @@ class Purgatory < ActiveRecord::Base
   belongs_to :requester, class_name: PurgatoryModule.configuration.user_class_name
   belongs_to :approver, class_name: PurgatoryModule.configuration.user_class_name
   before_create :store_changes
+  before_create :destroy_pending_with_same_soul
 
   validates :soul_type, presence: true
 
@@ -47,9 +48,17 @@ class Purgatory < ActiveRecord::Base
     false
   end
 
+  def self.pending_with_matching_soul(soul)
+    pending.where("soul_id IS NOT NULL AND soul_id = ? AND soul_type = ?", soul.id, soul.class.name)
+  end
+
   private
 
   def store_changes
     self.requested_changes = soul.changes
+  end
+
+  def destroy_pending_with_same_soul
+    Purgatory.pending_with_matching_soul(soul).destroy_all
   end
 end

@@ -24,6 +24,10 @@ To put your changes to an ActiveRecord class into Purgatory, simply make your ch
     item.price = 200
     purgatory = item.purgatory!(current_user) # returns the newly created purgatory or nil if the item is changes are invalid
 
+By default, if you call purgatory! on an object then any pending purgatories whose soul is that same object will be destroyed. If you'd prefer this not to happen then you can pass fail_if_matching_soul as a parameter and this will make it so if there are pending purgatories with a matching soul then purgatory! will return nil and nothing will happen: 
+
+    purgatory = item.purgatory!(current_user, fail_if_matching_soul: true) # Returns nil and does nothing if there is already a pending purgatory on same soul
+
 To apply the changes, simply call the approve! method on the associated Pergatory instance. You can pass in the approving user as an optional parameter
 
     purgatory = item.purgatories.last
@@ -43,13 +47,15 @@ The following are some attributes of a purgatory:
     purgatory.approver # The user who approved the purgatory
     purgatory.approved_at # The time when the purgatory was approved
 
-Here are some handy scopes and methods available to you:
+Here are some handy class and instance methods available to you:
 
-    ### Scopes
+    ### Class methods
     Purgatory.pending # Returns a relation of all pending purgatories
     Purgatory.approved # Returns a relation of all approved purgatories
+    Purgatory.pending_with_matching_soul(soul) # Returns a relation of
+    all pending purgatories with soul matching the object passed in
 
-    ### Methods
+    ### Instance methods
     purgatory.pending? # Returns true if the purgatory is pending, false otherwise
     purgatory.approved? # Returns true if the purgatory has been approved, false otherwise
 

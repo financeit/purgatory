@@ -39,6 +39,34 @@ describe Purgatory do
           @widget.purgatories.count.should == 1
           @widget.purgatories.first.should == @purgatory
         end
+
+        it "should delete old pending purgatories with same soul" do
+          @widget2 = Widget.create name: 'toy', price: 500
+          @widget2.name = 'Big Toy'
+          widget2_purgatory = @widget2.purgatory! user1
+          @widget.name = 'baz'
+          new_purgatory = @widget.purgatory! user1
+          Purgatory.find_by_id(@purgatory.id).should be_nil
+          Purgatory.find_by_id(widget2_purgatory.id).should be_present
+          Purgatory.pending.count.should == 2
+          Purgatory.last.requested_changes['name'].should == ['foo', 'baz'] 
+        end
+
+        it "should fail to create purgatory if matching pending Purgatory exists and fail_if_matching_soul is passed in" do
+          @widget.name = 'baz'
+          new_purgatory = @widget.purgatory! user1, fail_if_matching_soul: true
+          new_purgatory.should be_nil
+          Purgatory.find_by_id(@purgatory.id).should be_present
+          Purgatory.pending.count.should == 1
+        end
+
+        it "should succeed to create purgatory if matching approved Purgatory exists and fail_if_matching_soul is passed in" do
+          @purgatory.approve!
+          @widget.name = 'baz'
+          new_purgatory = @widget.purgatory! user1, fail_if_matching_soul: true
+          new_purgatory.should be_present
+          Purgatory.count.should == 2
+        end
       end
     
       it "should not allow invalid changes to be put into purgatory" do
