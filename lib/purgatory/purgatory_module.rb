@@ -13,6 +13,23 @@ module PurgatoryModule
     Purgatory.create soul: self, requester: requester, attr_accessor_fields: determine_attr_accessor_fields
   end
 
+  class Configuration
+    attr_accessor :user_class_name
+  end
+
+  class << self
+    def configure(&block)
+      yield(configuration)
+      configuration
+    end
+
+    def configuration
+      @_configuration ||= Configuration.new
+    end
+  end
+
+  private
+
   def determine_attr_accessor_fields
     hash = {}
 
@@ -39,20 +56,5 @@ module PurgatoryModule
                                                                 .map { |meth| meth.to_s.prepend('@').chop.to_sym }
 
     instance_variables & possible_instance_variables_from_setter_methods
-  end
-
-  class Configuration
-    attr_accessor :user_class_name
-  end
-
-  class << self
-    def configure(&block)
-      yield(configuration)
-      configuration
-    end
-
-    def configuration
-      @_configuration ||= Configuration.new
-    end
   end
 end

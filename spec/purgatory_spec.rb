@@ -335,7 +335,7 @@ describe Purgatory do
       end
 
       it "should be empty" do
-        @widget.attr_accessor_instance_variables.should == []
+        @widget.send(:attr_accessor_instance_variables).should == []
       end
     end
 
@@ -352,7 +352,7 @@ describe Purgatory do
       end
 
       it "should be empty" do
-        @widget.attr_accessor_instance_variables.should == []
+        @widget.send(:attr_accessor_instance_variables).should == []
       end
     end
 
@@ -368,7 +368,7 @@ describe Purgatory do
         end
         
         it "should contain right values" do
-          @widget.attr_accessor_instance_variables.should == [:@dante]
+          @widget.send(:attr_accessor_instance_variables).should == [:@dante]
         end
       end
 
@@ -383,7 +383,7 @@ describe Purgatory do
         end
         
         it "should contain right values" do
-          @widget.attr_accessor_instance_variables.should == [:@dante]
+          @widget.send(:attr_accessor_instance_variables).should == [:@dante]
         end
       end
 
@@ -397,7 +397,7 @@ describe Purgatory do
         end
         
         it "should contain right values" do
-          @widget.attr_accessor_instance_variables.should == [:@dante]
+          @widget.send(:attr_accessor_instance_variables).should == [:@dante]
         end
       end
     end
