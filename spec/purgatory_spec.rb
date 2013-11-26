@@ -218,7 +218,6 @@ describe Purgatory do
     context "approving object change purgatory with attr_accessor" do
       before do
         create_object_change_purgatory_with_attr_accessor
-          debugger
         @purgatory.approve!(user2)
         @item = Item.find(@item.id)
       end
