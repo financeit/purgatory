@@ -320,6 +320,78 @@ describe Purgatory do
     end
   end
 
+  describe "determine_attr_accessor_fields" do
+    before do
+      AttributeAccessorFields.options = {}
+    end
+    
+    after do
+      AttributeAccessorFields.options = {}
+    end
+
+    context "obj has no attr_accessors" do
+      before do
+        @obj = Widget.new
+      end
+
+      it "should not contain any thing" do
+        AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == {}
+      end
+    end
+
+    context "obj has attr_accessors" do
+      before do
+        klass = create_subclass_of(Widget)
+        klass.instance_eval { attr_accessor :dante, :minos, :charon }
+
+        @obj = klass.new
+
+        @obj.dante = "inferno"
+        @obj.minos = "inferno"
+        @obj.charon = "inferno"
+      end
+
+      context "options is empty" do
+        it "should not contain any attr_accessor values" do
+          AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == {}
+        end
+      end
+
+      context "options contain :local_attributes key" do
+        context "value of local_attributes is array" do
+          context "array size is 1" do
+            before do
+              AttributeAccessorFields.options = { local_attributes: [:dante] }
+            end
+
+            it "should only contain attr_accessors specified in array" do
+              AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno" }
+            end
+          end
+          context "array size is more than 1" do
+            before do
+              AttributeAccessorFields.options = { local_attributes: [:dante, :minos] }
+            end
+
+            it "should only contain attr_accessors specified in array" do
+              AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno" }
+            end
+
+          end
+        end
+        context "value of :local_variables is :all" do
+          before do
+            AttributeAccessorFields.options = { local_attributes: :all }
+          end
+
+          it "should automatically determine attr_accessor values that doesnt include ones belonging to AR::Base and its ancestors, and then store these values" do
+            AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno", :@charon => "inferno" }
+          end
+        end
+      end
+    end
+  end
+
   describe "#attr_accessor_instance_variables" do
     context "attr_accessor defined in a module/class that is an ancestor of ActiveRecord::Base" do
       before do

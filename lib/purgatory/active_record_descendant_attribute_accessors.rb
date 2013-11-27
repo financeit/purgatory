@@ -18,14 +18,4 @@ module ActiveRecordDescendantAttributeAccessors
     obj.instance_variables & possible_instance_variables_from_setter_methods
   end
 
-  def self.determine_attr_accessor_fields(obj)
-    hash = {}
-
-    attr_accessor_instance_variables(obj).each do |var|
-      hash[var] = obj.instance_variable_get(var)
-    end
-
-    hash
-  end
-
 end

@@ -1,7 +1,7 @@
 require 'purgatory'
 
 class Item < ActiveRecord::Base
-  use_purgatory
+  use_purgatory local_attributes: [:dante]
 
   validates :name, presence: true
 

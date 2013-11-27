@@ -1,10 +1,11 @@
-require 'purgatory/active_record_descendant_attribute_accessors'
+require 'purgatory/attribute_accessor_fields'
 
 module PurgatoryModule
   extend ActiveSupport::Concern
 
   module ClassMethods
-    def use_purgatory
+    def use_purgatory(options={})
+      AttributeAccessorFields.options = options
       self.has_many :purgatories, as: :soul
     end
   end
@@ -12,7 +13,7 @@ module PurgatoryModule
   def purgatory!(requester = nil, options = {})
     return nil if self.invalid?
     return nil if Purgatory.pending_with_matching_soul(self).any? && options[:fail_if_matching_soul]
-    Purgatory.create soul: self, requester: requester, attr_accessor_fields: ActiveRecordDescendantAttributeAccessors.determine_attr_accessor_fields(self)
+    Purgatory.create soul: self, requester: requester, attr_accessor_fields: AttributeAccessorFields.determine_attr_accessor_fields(self)
   end
 
   class Configuration
