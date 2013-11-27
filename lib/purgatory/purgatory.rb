@@ -37,7 +37,7 @@ class Purgatory < ActiveRecord::Base
 
   def approve!(approver = nil)
     return false if approved?
-    requested_changes.each{|k,v| soul.send "#{k}=", v[1]}
+    requested_changes.each{|k,v| soul.send(:write_attribute, k, v[1])}
     if soul.save
       self.approver = approver
       self.approved_at = Time.now
