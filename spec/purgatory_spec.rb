@@ -335,7 +335,7 @@ describe Purgatory do
       end
 
       it "should not include instance_variables that belong to ancestor of ActiveRecord::Base" do
-        @widget.attr_accessor_instance_variables.should == []
+        ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == []
       end
     end
 
@@ -352,7 +352,7 @@ describe Purgatory do
       end
 
       it "should not include instance_variables that belong to ActiveRecord::Base" do
-        @widget.attr_accessor_instance_variables.should == []
+        ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == []
       end
     end
 
@@ -368,7 +368,7 @@ describe Purgatory do
         end
         
         it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
-          @widget.attr_accessor_instance_variables.should == [:@dante]
+          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
         end
       end
 
@@ -384,7 +384,7 @@ describe Purgatory do
         end
         
         it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
-          @widget.attr_accessor_instance_variables.should == [:@dante]
+          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
         end
       end
 
@@ -398,7 +398,7 @@ describe Purgatory do
         end
         
         it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
-          @widget.attr_accessor_instance_variables.should == [:@dante]
+          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
         end
       end
     end
