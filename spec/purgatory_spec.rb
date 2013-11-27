@@ -322,11 +322,11 @@ describe Purgatory do
 
   describe "determine_attr_accessor_fields" do
     before do
-      AttributeAccessorFields.options = {}
+      AttributeAccessorFields.local_attributes = nil
     end
     
     after do
-      AttributeAccessorFields.options = {}
+      AttributeAccessorFields.local_attributes = nil
     end
 
     context "obj has no attr_accessors" do
@@ -351,42 +351,41 @@ describe Purgatory do
         @obj.charon = "inferno"
       end
 
-      context "options is empty" do
+      context "local_attributes is empty" do
         it "should not contain any attr_accessor values" do
           AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == {}
         end
       end
 
-      context "options contain :local_attributes key" do
-        context "value of local_attributes is array" do
-          context "array size is 1" do
-            before do
-              AttributeAccessorFields.options = { local_attributes: [:dante] }
-            end
-
-            it "should only contain attr_accessors specified in array" do
-              AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno" }
-            end
+      context "local_attributes is array" do
+        context "array size is 1" do
+          before do
+            AttributeAccessorFields.local_attributes = [:dante] 
           end
-          context "array size is more than 1" do
-            before do
-              AttributeAccessorFields.options = { local_attributes: [:dante, :minos] }
-            end
 
-            it "should only contain attr_accessors specified in array" do
-              AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno" }
-            end
-
+          it "should only contain attr_accessors specified in array" do
+            AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno" }
           end
         end
-        context "value of :local_variables is :all" do
+        context "array size is more than 1" do
           before do
-            AttributeAccessorFields.options = { local_attributes: :all }
+            AttributeAccessorFields.local_attributes = [:dante, :minos]
           end
 
-          it "should automatically determine attr_accessor values that doesnt include ones belonging to AR::Base and its ancestors, and then store these values" do
-            AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno", :@charon => "inferno" }
+          it "should only contain attr_accessors specified in array" do
+            AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno" }
           end
+
+        end
+      end
+      
+      context "value of local_variables is :all" do
+        before do
+          AttributeAccessorFields.local_attributes = :all
+        end
+
+        it "should automatically determine attr_accessor values that doesnt include ones belonging to AR::Base and its ancestors, and then store these values" do
+          AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno", :@charon => "inferno" }
         end
       end
     end
