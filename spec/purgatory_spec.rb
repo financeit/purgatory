@@ -376,7 +376,8 @@ describe Purgatory do
         before do
           klass    = Class.new(Widget)
           subklass = Class.new(klass)
-          subklass.instance_eval { attr_accessor :dante }
+
+          klass.instance_eval { attr_accessor :dante }
 
           @widget = subklass.new name: 'foo', price: 100
           @widget.dante = "inferno"
