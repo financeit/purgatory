@@ -334,8 +334,8 @@ describe Purgatory do
         @active_record_ancestor.class_eval { undef :dante= }
       end
 
-      it "should be empty" do
-        @widget.send(:attr_accessor_instance_variables).should == []
+      it "should not include instance_variables that belong to ancestor of ActiveRecord::Base" do
+        @widget.attr_accessor_instance_variables.should == []
       end
     end
 
@@ -351,15 +351,15 @@ describe Purgatory do
         ActiveRecord::Base.class_eval { undef :dante= }
       end
 
-      it "should be empty" do
-        @widget.send(:attr_accessor_instance_variables).should == []
+      it "should not include instance_variables that belong to ActiveRecord::Base" do
+        @widget.attr_accessor_instance_variables.should == []
       end
     end
 
     context "attr_accessor defined in a module/class that is not an ancestor of ActiveRecord::Base" do
       context "attr_accessor defined in a module mixin" do
         before do
-          klass = Class.new(Widget)
+          klass = create_subclass_of(Widget)
           module A; attr_accessor :dante; end
           klass.instance_eval { include A }
 
@@ -367,15 +367,15 @@ describe Purgatory do
           @widget.dante = "inferno"
         end
         
-        it "should contain right values" do
-          @widget.send(:attr_accessor_instance_variables).should == [:@dante]
+        it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
+          @widget.attr_accessor_instance_variables.should == [:@dante]
         end
       end
 
       context "attr_accessor defined in a superclass" do
         before do
-          klass    = Class.new(Widget)
-          subklass = Class.new(klass)
+          klass = create_subclass_of(Widget)
+          subklass = create_subclass_of(klass)
 
           klass.instance_eval { attr_accessor :dante }
 
@@ -383,22 +383,22 @@ describe Purgatory do
           @widget.dante = "inferno"
         end
         
-        it "should contain right values" do
-          @widget.send(:attr_accessor_instance_variables).should == [:@dante]
+        it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
+          @widget.attr_accessor_instance_variables.should == [:@dante]
         end
       end
 
       context "attr_accessor defined in a class" do
         before do
-          klass    = Class.new(Widget)
+          klass    = create_subclass_of(Widget)
           klass.instance_eval { attr_accessor :dante }
 
           @widget = klass.new name: 'foo', price: 100
           @widget.dante = "inferno"
         end
         
-        it "should contain right values" do
-          @widget.send(:attr_accessor_instance_variables).should == [:@dante]
+        it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
+          @widget.attr_accessor_instance_variables.should == [:@dante]
         end
       end
     end
@@ -441,5 +441,9 @@ describe Purgatory do
     item = Item.new name: 'foo', price: 100, dante: "inferno"
     purgatory = item.purgatory! user1
     @purgatory = Purgatory.find(purgatory.id)
+  end
+
+  def create_subclass_of(klass)
+    Class.new(klass)  
   end
 end
