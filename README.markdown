@@ -99,13 +99,13 @@ Here are some handy class and instance methods available to you:
   
     use_purgatory :local_attributes => [:foo, :bar]
 
-    When you pass a hash that contains a list of virtual attributes that you want to save, purgatory would save the values of these attributes into the purgatory table during the "purgatory!" phase, so that when "approve!" is later called, the virtual attributes would be retrieved and would continue to be available in the remaining activerecord lifecyle.
+    When you pass a hash that contains a list of virtual attributes that you want to save, purgatory will save the values of these attributes into the purgatory table during the "purgatory!" phase, so that when "approve!" is later called, the virtual attributes will be retrieved and will continue to be available in the remaining activerecord lifecyle.
 
   2. Automatic 
 
     use_purgatory :local_attributes => :all
 
-    By specifying all, we would programmatically determine what the virtual attributes are and save them when "purgatory!" is called, so that they would be available during "approve!".
+    By specifying all, Purgatory will programmatically determine what the virtual attributes are and save them when "purgatory!" is called, so that they will be available during "approve!".
   
 
 ## Contributing to Purgatory
