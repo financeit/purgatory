@@ -15,4 +15,5 @@ group :test do
   gem "activerecord", ">= 4"
   gem "rspec"
   gem "sqlite3"
+  gem "pry"
 end

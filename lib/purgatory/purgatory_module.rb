@@ -5,7 +5,7 @@ module PurgatoryModule
 
   module ClassMethods
     def use_purgatory(options={})
-      AttributeAccessorFields.local_attributes = options[:local_attributes]
+      AttributeAccessorFields.set_local_attributes_to_save(self,options[:local_attributes]) 
       self.has_many :purgatories, as: :soul
     end
   end

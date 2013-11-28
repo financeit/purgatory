@@ -320,15 +320,66 @@ describe Purgatory do
     end
   end
 
-  describe "determine_attr_accessor_fields" do
-    before do
-      AttributeAccessorFields.local_attributes = nil
-    end
-    
-    after do
-      AttributeAccessorFields.local_attributes = nil
-    end
+  describe "use_purgatory" do
+    context "on class that has attr_accessors" do
+      context "use_purgatory with no arguments" do
+        before do
+          @klass = create_subclass_of(Item)
+          @klass.instance_eval { use_purgatory }
+        end
 
+        it "should not store attr_accessors" do
+          obj = @klass.new name: 'foo', price: 100, dante: "inferno"
+          purgatory = obj.purgatory! user1
+          purgatory.attr_accessor_fields.should == {}
+        end
+      end
+
+      context "use_purgatory with valid arguments" do
+        context "use_purgatory with one active record class" do
+          before do
+            @klass = create_subclass_of(Item)
+            @klass.instance_eval { use_purgatory :local_attributes => [:dante] }
+          end
+
+          it "should work" do
+            obj = @klass.new name: 'foo', price: 100, dante: "inferno"
+            purgatory = obj.purgatory! user1
+            purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
+          end
+        end
+
+        context "use_purgatory with more than one active record class" do
+          before do
+            @klass = create_subclass_of(Item)
+            @klass.instance_eval { use_purgatory :local_attributes => [:dante] }
+
+            @klass_2 = create_subclass_of(Item)
+            @klass_2.instance_eval { use_purgatory :local_attributes => [:minos]; attr_accessor :minos }
+
+            @klass_3 = create_subclass_of(Item)
+            @klass_3.instance_eval { use_purgatory }
+          end
+
+          it "should work" do
+            obj = @klass.new name: 'foo', price: 100, dante: "inferno"
+            purgatory = obj.purgatory! user1
+            purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
+
+            obj = @klass_2.new name: 'foo', price: 100, minos: "inferno"
+            purgatory = obj.purgatory! user1
+            purgatory.attr_accessor_fields.should == { :@minos => "inferno" }
+
+            obj = @klass_3.new name: 'foo', price: 100
+            purgatory = obj.purgatory! user1
+            purgatory.attr_accessor_fields.should == {}
+          end
+        end
+      end
+    end
+  end
+
+  describe "determine_attr_accessor_fields" do
     context "obj has no attr_accessors" do
       before do
         @obj = Widget.new
@@ -341,10 +392,10 @@ describe Purgatory do
 
     context "obj has attr_accessors" do
       before do
-        klass = create_subclass_of(Widget)
-        klass.instance_eval { attr_accessor :dante, :minos, :charon }
+        @klass = create_subclass_of(Widget)
+        @klass.instance_eval { attr_accessor :dante, :minos, :charon }
 
-        @obj = klass.new
+        @obj = @klass.new
 
         @obj.dante = "inferno"
         @obj.minos = "inferno"
@@ -360,7 +411,7 @@ describe Purgatory do
       context "local_attributes is array" do
         context "array size is 1" do
           before do
-            AttributeAccessorFields.local_attributes = [:dante] 
+            AttributeAccessorFields.set_local_attributes_to_save(@klass,[:dante])
           end
 
           it "should only contain attr_accessors specified in array" do
@@ -369,7 +420,7 @@ describe Purgatory do
         end
         context "array size is more than 1" do
           before do
-            AttributeAccessorFields.local_attributes = [:dante, :minos]
+            AttributeAccessorFields.set_local_attributes_to_save(@klass,[:dante, :minos])
           end
 
           it "should only contain attr_accessors specified in array" do
@@ -381,7 +432,7 @@ describe Purgatory do
       
       context "value of local_variables is :all" do
         before do
-          AttributeAccessorFields.local_attributes = :all
+          AttributeAccessorFields.set_local_attributes_to_save(@klass,:all)
         end
 
         it "should automatically determine attr_accessor values that doesnt include ones belonging to AR::Base and its ancestors, and then store these values" do
