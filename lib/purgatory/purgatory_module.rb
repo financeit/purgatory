@@ -1,8 +1,11 @@
+require 'purgatory/attribute_accessor_fields'
+
 module PurgatoryModule
   extend ActiveSupport::Concern
 
   module ClassMethods
-    def use_purgatory
+    def use_purgatory(options={})
+      AttributeAccessorFields.local_attributes = options[:local_attributes]
       self.has_many :purgatories, as: :soul
     end
   end
@@ -10,7 +13,7 @@ module PurgatoryModule
   def purgatory!(requester = nil, options = {})
     return nil if self.invalid?
     return nil if Purgatory.pending_with_matching_soul(self).any? && options[:fail_if_matching_soul]
-    Purgatory.create soul: self, requester: requester
+    Purgatory.create soul: self, requester: requester, attr_accessor_fields: AttributeAccessorFields.determine_attr_accessor_fields(self)
   end
 
   class Configuration
@@ -27,4 +30,5 @@ module PurgatoryModule
       @_configuration ||= Configuration.new
     end
   end
+
 end

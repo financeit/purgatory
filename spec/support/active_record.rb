@@ -21,6 +21,12 @@ ActiveRecord::Migration.create_table :animals do |t|
   t.string :type
   t.integer :price 
   t.string :original_name 
+end
+
+ActiveRecord::Migration.create_table :items do |t|
+  t.string :name
+  t.integer :price
+  t.string :original_name 
   t.timestamps
 end
 

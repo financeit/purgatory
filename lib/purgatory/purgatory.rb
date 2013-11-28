@@ -10,6 +10,7 @@ class Purgatory < ActiveRecord::Base
   validates :soul_type, presence: true
 
   serialize :requested_changes
+  serialize :attr_accessor_fields
 
   def self.pending
     where(approved_at: nil)
@@ -38,6 +39,7 @@ class Purgatory < ActiveRecord::Base
   def approve!(approver = nil)
     return false if approved?
     requested_changes.each{|k,v| soul.send(:write_attribute, k, v[1])}
+    attr_accessor_fields.each{|k,v| soul.instance_variable_set(k, v)}
     if soul.save
       self.approver = approver
       self.approved_at = Time.now

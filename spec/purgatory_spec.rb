@@ -2,6 +2,7 @@ require 'support/active_record'
 require 'support/widget'
 require 'support/user'
 require 'support/animal'
+require 'support/item'
 require 'purgatory/purgatory'
 
 describe Purgatory do
@@ -66,6 +67,26 @@ describe Purgatory do
           new_purgatory = @widget.purgatory! user1, fail_if_matching_soul: true
           new_purgatory.should be_present
           Purgatory.count.should == 2
+        end
+      end
+
+      context "valid changes with attr_accessor" do
+        before do
+          create_object_change_purgatory_with_attr_accessor
+          @item = Item.find(@item.id)
+        end
+
+        it "should not change the object" do
+          @item.name.should == 'foo'
+          @item.price.should == 100
+        end
+
+        it "should not save attr_accessor variable of object" do
+          @item.dante.should == nil
+        end
+
+        it "should store the attr_accessor variables in the Purgatory object" do
+          @purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
         end
       end
     
@@ -140,6 +161,24 @@ describe Purgatory do
         end
       end
     
+      context "valid object with attr_accessor" do
+        before do
+          create_new_object_purgatory_with_attr_accessor
+        end
+
+        it "should store the attr_accessor variables in the Purgatory object" do
+          @purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
+        end
+
+        it "should store the requester and requested changes" do
+          @purgatory.requester.should == user1
+          @purgatory.requested_changes['name'].first.should == nil
+          @purgatory.requested_changes['name'].last.should == 'foo'
+          @purgatory.requested_changes['price'].first.should == nil
+          @purgatory.requested_changes['price'].last.should == 100
+        end
+      end
+
       it "should not allow invalid object creation to be put into purgatory" do
         widget = Widget.new name: ''
         widget.purgatory!(user1).should be_nil      
@@ -160,6 +199,36 @@ describe Purgatory do
       it "should apply the changes" do
         @widget.name.should == 'bar'
         @widget.price.should == 200
+      end
+      
+      it "should mark purgatory as approved and store approver" do
+        @purgatory.approver.should == user2
+        @purgatory.should be_approved
+        @purgatory.should_not be_pending            
+        Purgatory.pending.count.should be_zero
+        Purgatory.approved.count.should == 1
+        Purgatory.approved.first.should == @purgatory
+      end
+      
+      it "should fail if you try to approve again" do
+        @purgatory.approve!(user2).should be_false
+      end
+    end
+
+    context "approving object change purgatory with attr_accessor" do
+      before do
+        create_object_change_purgatory_with_attr_accessor
+        @purgatory.approve!(user2)
+        @item = Item.find(@item.id)
+      end
+
+      it "should apply the changes" do
+        @item.name.should == 'bar'
+        @item.price.should == 200
+      end
+
+      it "should apply changes that depend on attr_accessor instance_variable" do
+        @item.original_name.should == "inferno"
       end
       
       it "should mark purgatory as approved and store approver" do
@@ -217,7 +286,25 @@ describe Purgatory do
         dog.original_name.should == 'doggy'
         dog.price.should == Dog::DEFAULT_PRICE
       end
+    end
 
+    context "approving new object creation with attr_accessor" do
+      before do
+        create_new_object_purgatory_with_attr_accessor
+        @purgatory.approve!(user2)
+      end
+
+      it "should create the new object and apply any callbacks" do
+        Item.count.should == 1
+        item = Item.first
+        item.name.should == 'foo'
+        item.price.should == 100
+      end
+
+      it "should apply changes that depend on attr_accessor instance_variable" do
+        Item.first.original_name.should == 'inferno'
+      end
+      
       it "should mark purgatory as approved and store approver" do
         @purgatory.approver.should == user2
         @purgatory.should be_approved
@@ -232,6 +319,161 @@ describe Purgatory do
       end
     end
   end
+
+  describe "determine_attr_accessor_fields" do
+    before do
+      AttributeAccessorFields.local_attributes = nil
+    end
+    
+    after do
+      AttributeAccessorFields.local_attributes = nil
+    end
+
+    context "obj has no attr_accessors" do
+      before do
+        @obj = Widget.new
+      end
+
+      it "should not contain any thing" do
+        AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == {}
+      end
+    end
+
+    context "obj has attr_accessors" do
+      before do
+        klass = create_subclass_of(Widget)
+        klass.instance_eval { attr_accessor :dante, :minos, :charon }
+
+        @obj = klass.new
+
+        @obj.dante = "inferno"
+        @obj.minos = "inferno"
+        @obj.charon = "inferno"
+      end
+
+      context "local_attributes is empty" do
+        it "should not contain any attr_accessor values" do
+          AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == {}
+        end
+      end
+
+      context "local_attributes is array" do
+        context "array size is 1" do
+          before do
+            AttributeAccessorFields.local_attributes = [:dante] 
+          end
+
+          it "should only contain attr_accessors specified in array" do
+            AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno" }
+          end
+        end
+        context "array size is more than 1" do
+          before do
+            AttributeAccessorFields.local_attributes = [:dante, :minos]
+          end
+
+          it "should only contain attr_accessors specified in array" do
+            AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno" }
+          end
+
+        end
+      end
+      
+      context "value of local_variables is :all" do
+        before do
+          AttributeAccessorFields.local_attributes = :all
+        end
+
+        it "should automatically determine attr_accessor values that doesnt include ones belonging to AR::Base and its ancestors, and then store these values" do
+          AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno", :@charon => "inferno" }
+        end
+      end
+    end
+  end
+
+  describe "#attr_accessor_instance_variables" do
+    context "attr_accessor defined in a module/class that is an ancestor of ActiveRecord::Base" do
+      before do
+        @active_record_ancestor = ActiveRecord::Base.ancestors[1]
+        @active_record_ancestor.instance_eval { attr_accessor :dante }
+        @widget = Widget.new name: 'foo', price: 100
+        @widget.dante = "inferno"
+      end
+      
+      after do
+        @active_record_ancestor.class_eval { undef :dante  }
+        @active_record_ancestor.class_eval { undef :dante= }
+      end
+
+      it "should not include instance_variables that belong to ancestor of ActiveRecord::Base" do
+        ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == []
+      end
+    end
+
+    context "attr_accessor defined in ActiveRecord::Base" do
+      before do
+        ActiveRecord::Base.instance_eval { attr_accessor :dante }
+        @widget = Widget.new name: 'foo', price: 100
+        @widget.dante = "inferno"
+      end
+      
+      after do
+        ActiveRecord::Base.class_eval { undef :dante  }
+        ActiveRecord::Base.class_eval { undef :dante= }
+      end
+
+      it "should not include instance_variables that belong to ActiveRecord::Base" do
+        ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == []
+      end
+    end
+
+    context "attr_accessor defined in a module/class that is not an ancestor of ActiveRecord::Base" do
+      context "attr_accessor defined in a module mixin" do
+        before do
+          klass = create_subclass_of(Widget)
+          module A; attr_accessor :dante; end
+          klass.instance_eval { include A }
+
+          @widget = klass.new name: 'foo', price: 100
+          @widget.dante = "inferno"
+        end
+        
+        it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
+          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
+        end
+      end
+
+      context "attr_accessor defined in a superclass" do
+        before do
+          klass = create_subclass_of(Widget)
+          subklass = create_subclass_of(klass)
+
+          klass.instance_eval { attr_accessor :dante }
+
+          @widget = subklass.new name: 'foo', price: 100
+          @widget.dante = "inferno"
+        end
+        
+        it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
+          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
+        end
+      end
+
+      context "attr_accessor defined in a class" do
+        before do
+          klass    = create_subclass_of(Widget)
+          klass.instance_eval { attr_accessor :dante }
+
+          @widget = klass.new name: 'foo', price: 100
+          @widget.dante = "inferno"
+        end
+        
+        it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
+          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
+        end
+      end
+    end
+  end
   
   private
   
@@ -243,7 +485,7 @@ describe Purgatory do
     @purgatory = Purgatory.find(purgatory.id)
     @widget.reload
   end
-  
+
   def create_new_object_purgatory
     widget = Widget.new name: 'foo', price: 100
     purgatory = widget.purgatory! user1
@@ -256,4 +498,23 @@ describe Purgatory do
     @purgatory = Purgatory.find(purgatory.id)
   end
   
+  def create_object_change_purgatory_with_attr_accessor
+    @item = Item.create name: 'foo', price: 100, dante: "classic"
+    @item.name = 'bar'
+    @item.price = 200
+    @item.dante = "inferno"
+    purgatory = @item.purgatory! user1
+    @purgatory = Purgatory.find(purgatory.id)
+    @item.reload
+  end
+
+  def create_new_object_purgatory_with_attr_accessor
+    item = Item.new name: 'foo', price: 100, dante: "inferno"
+    purgatory = item.purgatory! user1
+    @purgatory = Purgatory.find(purgatory.id)
+  end
+
+  def create_subclass_of(klass)
+    Class.new(klass)  
+  end
 end
