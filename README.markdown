@@ -59,6 +59,55 @@ Here are some handy class and instance methods available to you:
     purgatory.pending? # Returns true if the purgatory is pending, false otherwise
     purgatory.approved? # Returns true if the purgatory has been approved, false otherwise
 
+### ActiveRecord Lifecycle
+
+  When using purgatory, the timing of the activerecord lifecycle differs a bit. Normally when you run "ActiveRecord#save", the entire lifecycle of activerecord gets triggered by default. But when you replace "save" with "purgatory!", the callbacks woould only run until after_validation. It's only after you run "approve!" when the rest of callbacks (ie. before_save, after_create) gets triggered as well.
+
+    ## Normal lifecycle
+
+    before_validation
+    after_validation
+    before_save
+    around_save
+    before_create
+    around_create
+    after_create
+    after_save 
+
+    ## Purgatory lifecycle
+
+    # purgatory!
+    before_validation
+    after_validation
+
+    # approve!
+    before_validation
+    after_validation
+    before_save
+    around_save
+    before_create
+    around_create
+    after_create
+    after_save 
+
+
+### Handling Virtual Attributes
+
+  Virtual attributes allow users store variables into active record objects temporarily without saving them into the database (usually created using attr_accessor). Because these attributes are sometimes being used even on later stages of activerecord lifecycle (i.e after_create, after_save), it's important that these virtual attributes continue to exist while using purgatory. If you're using purgatory, by default, these virtual attributes would only exist on "purgatory!" phase, and would get lost on the "approve!" phase. To make sure this doesn't happen, there are 2 ways of handling it. 
+
+  1. Manual 
+  
+    use_purgatory :local_attributes => [:foo, :bar]
+
+    When you pass a hash that contains a list of virtual attributes that you want to save, purgatory would save the values of these attributes into the purgatory table during the "purgatory!" phase, so that when "approve!" is later called, the virtual attributes would be retrieved and would continue to be available in the remaining activerecord lifecyle.
+
+  2. Automatic 
+
+    use_purgatory :local_attributes => :all
+
+    By specifying all, we would programmatically determine what the virtual attributes are and save them when "purgatory!" is called, so that they would be available during "approve!".
+  
+
 ## Contributing to Purgatory
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
