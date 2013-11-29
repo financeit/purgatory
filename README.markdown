@@ -58,6 +58,7 @@ Here are some handy class and instance methods available to you:
     ### Instance methods
     purgatory.pending? # Returns true if the purgatory is pending, false otherwise
     purgatory.approved? # Returns true if the purgatory has been approved, false otherwise
+    purgatory.soul_with_changes # Returns the soul with the changes applied (not saved)
 
 ### ActiveRecord Lifecycle
 
