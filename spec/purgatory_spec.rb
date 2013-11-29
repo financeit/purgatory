@@ -30,6 +30,12 @@ describe Purgatory do
           @purgatory.requested_changes['price'].first.should == 100
           @purgatory.requested_changes['price'].last.should == 200
         end
+
+        it "should return soul with changes if requested" do
+          soul_with_changes = @purgatory.soul_with_changes
+          soul_with_changes.name.should == 'bar'
+          soul_with_changes.price.should == 200
+        end
     
         it "should not change the widget" do
           @widget.name.should == 'foo'
@@ -87,6 +93,10 @@ describe Purgatory do
 
         it "should store the attr_accessor variables in the Purgatory object" do
           @purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
+        end
+
+        it "should return item with changed attr_accessor if requested" do
+          @purgatory.soul_with_changes.dante.should == 'inferno'
         end
       end
     

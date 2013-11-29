@@ -36,11 +36,15 @@ class Purgatory < ActiveRecord::Base
     requested_changes['type'].try(:last)
   end
 
-  def approve!(approver = nil)
-    return false if approved?
+  def soul_with_changes
     requested_changes.each{|k,v| soul.send(:write_attribute, k, v[1])}
     attr_accessor_fields.each{|k,v| soul.instance_variable_set(k, v)}
-    if soul.save
+    soul
+  end
+
+  def approve!(approver = nil)
+    return false if approved? 
+    if soul_with_changes.save
       self.approver = approver
       self.approved_at = Time.now
       save
