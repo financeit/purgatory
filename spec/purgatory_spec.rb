@@ -277,6 +277,12 @@ describe Purgatory do
         Purgatory.approved.count.should == 1
         Purgatory.approved.first.should == @purgatory
       end
+
+      it "should store the id of the newly created object so the purgatory can be accessed through the object" do
+        widget = Widget.first
+        widget.purgatories.count.should == 1
+        widget.purgatories.first.should == @purgatory 
+      end
       
       it "should fail if you try to approve again" do
         @purgatory.approve!(user2).should be_false

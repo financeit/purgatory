@@ -47,6 +47,7 @@ class Purgatory < ActiveRecord::Base
     if soul_with_changes.save
       self.approver = approver
       self.approved_at = Time.now
+      self.soul_id = soul.id
       save
       return true
     end
