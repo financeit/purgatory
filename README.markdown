@@ -1,6 +1,6 @@
 # Purgatory
 
-Purgatory is a Rails gem that allows you to save changes to an ActiveRecord model so that they can be applied at a later time
+Purgatory is a Rails gem that allows you to save changes to an ActiveRecord model so that they can be applied at a later time.
 
 ## How to Use
 
