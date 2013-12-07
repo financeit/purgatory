@@ -4,4 +4,4 @@ rvm:
   - 2.0.0
 cache:
   bundler: true
-
+script: bundle exec rspec
