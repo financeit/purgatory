@@ -170,6 +170,18 @@ describe Purgatory do
           Dog.count.should be_zero
         end
       end
+
+      context "create STI object change purgatory" do
+        before {create_object_change_purgatory_with_sti}
+
+        it "should delete old purgatory on object if new one is created" do
+          Purgatory.count.should == 1
+          @dog.name = 'fluffy'
+          @dog.purgatory!(user1)
+          Purgatory.last.requested_changes['name'].last.should == 'fluffy'
+          Purgatory.count.should == 1
+        end
+      end
     
       context "valid object with attr_accessor" do
         before do
@@ -563,6 +575,14 @@ describe Purgatory do
     dog = Dog.new name: 'doggy'
     purgatory = dog.purgatory! user1
     @purgatory = Purgatory.find(purgatory.id)
+  end
+
+  def create_object_change_purgatory_with_sti
+    @dog = Dog.create name: 'doggy'
+    @dog.name = 'codey'
+    purgatory = @dog.purgatory! user1
+    @purgatory = Purgatory.find(purgatory.id)
+    @dog.reload
   end
   
   def create_object_change_purgatory_with_attr_accessor
