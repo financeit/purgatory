@@ -1,5 +1,8 @@
 # Purgatory
 
+[![Build Status](https://secure.travis-ci.org/financeit/purgatory.png)](http://travis-ci.org/financeit/purgatory)
+[![Code Climate](https://codeclimate.com/github/financeit/purgatory.png)](https://codeclimate.com/github/financeit/purgatory)
+
 Purgatory is a Rails gem that allows you to save changes to an ActiveRecord model so that they can be applied at a later time.
 
 ## How to Use
