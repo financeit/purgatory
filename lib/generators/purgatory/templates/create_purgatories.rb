@@ -11,5 +11,9 @@ class CreatePurgatories < ActiveRecord::Migration
 
       t.timestamps
     end
+    
+    add_index :purgatories, [:soul_id, :soul_type]
+    add_index :purgatories, :requester_id
+    add_index :purgatories, :approver_id
   end
 end
