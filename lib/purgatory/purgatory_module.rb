@@ -10,6 +10,10 @@ module PurgatoryModule
     end
   end
 
+  def purge(requester = nil, options = {})
+    Purge.new(self, requester, options)
+  end
+
   def purgatory!(requester = nil, options = {})
     return nil if self.invalid?
     return nil if Purgatory.pending_with_matching_soul(self).any? && options[:fail_if_matching_soul]
@@ -18,6 +22,19 @@ module PurgatoryModule
 
   class Configuration
     attr_accessor :user_class_name
+  end
+
+  class Purge
+    def initialize(soul, requester, options)
+      @soul = soul
+      @requester = requester
+      @options = options
+    end
+
+    def method_missing(method, *args)
+      return nil if Purgatory.pending_with_matching_soul(@soul).any? && @options[:fail_if_matching_soul]
+      Purgatory.create soul: @soul, requester: @requester, performable_method: {method: method.to_sym, args: args}
+    end
   end
 
   class << self

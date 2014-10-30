@@ -8,6 +8,7 @@ class CreatePurgatories < ActiveRecord::Migration
       t.datetime :approved_at
       t.text :requested_changes
       t.text :attr_accessor_fields
+      t.text :performable_method
 
       t.timestamps
     end
