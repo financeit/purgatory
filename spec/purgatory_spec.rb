@@ -346,6 +346,16 @@ describe Purgatory do
         @purgatory.approve!(user2).should be_false
       end
     end
+
+    context "approving method call purgatory" do
+      before{create_method_call_purgatory}
+      it "should call the method" do
+        @widget.name.should == 'foo'
+        @purgatory.approve!
+        @widget.reload
+        @widget.name.should == 'bar'
+      end
+    end
   end
 
   describe "use_purgatory" do
