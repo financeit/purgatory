@@ -41,13 +41,13 @@ You can also put the creation of a new object into Purgatory
     item = Item.new price: 100
     purgatory = item.purgatory!
 
-Call .purge.method(params) to put a method call into Purgatory. When the purgatory is approved the method will be called on the soul
+Call ._for_review.method(params) to put a method call into Purgatory. When the purgatory is approved the method will be called on the soul
 
     #without purgatory:
     item.increase_price(200)
 
     #with purgatory:
-    item.purge(current_user).increase_price(200)
+    item._for_review(current_user).increase_price(200)
 
 The following are some attributes of a purgatory:
 

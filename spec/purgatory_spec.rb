@@ -562,7 +562,7 @@ describe Purgatory do
         end
       end
     end
-    context :purge do
+    context :for_review do
       context "putting method call into purgatory" do
         context "valid changes" do
           before {create_method_call_purgatory}
@@ -586,9 +586,9 @@ describe Purgatory do
           it "should delete old pending purgatories with same soul" do
             @widget2 = Widget.create name: 'toy', price: 500
             @widget2.name = 'Big Toy'
-            widget2_purgatory = @widget2.purge(user1).rename('bar')
+            widget2_purgatory = @widget2._for_review(user1).rename('bar')
             @widget.name = 'baz'
-            new_purgatory = @widget.purge(user1).rename('bar')
+            new_purgatory = @widget._for_review(user1).rename('bar')
             Purgatory.find_by_id(@purgatory.id).should be_nil
             Purgatory.find_by_id(widget2_purgatory.id).should be_present
             Purgatory.pending.count.should == 2
@@ -597,7 +597,7 @@ describe Purgatory do
 
           it "should fail to create purgatory if matching pending Purgatory exists and fail_if_matching_soul is passed in" do
             @widget.name = 'baz'
-            new_purgatory = @widget.purge(user1, fail_if_matching_soul: true).rename('bar')
+            new_purgatory = @widget._for_review(user1, fail_if_matching_soul: true).rename('bar')
             new_purgatory.should be_nil
             Purgatory.find_by_id(@purgatory.id).should be_present
             Purgatory.pending.count.should == 1
@@ -606,7 +606,7 @@ describe Purgatory do
           it "should succeed to create purgatory if matching approved Purgatory exists and fail_if_matching_soul is passed in" do
             @purgatory.approve!
             @widget.name = 'baz'
-            new_purgatory = @widget.purge(user1, fail_if_matching_soul: true).rename('bar')
+            new_purgatory = @widget._for_review(user1, fail_if_matching_soul: true).rename('bar')
             new_purgatory.should be_present
             Purgatory.count.should == 2
           end
@@ -628,7 +628,7 @@ describe Purgatory do
 
   def create_method_call_purgatory
     @widget = Widget.create name: 'foo', price: 100
-    purgatory = @widget.purge(user1).rename('bar')
+    purgatory = @widget._for_review(user1).rename('bar')
     @purgatory = Purgatory.find(purgatory.id)
     @widget.reload
   end
