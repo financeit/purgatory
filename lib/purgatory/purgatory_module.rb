@@ -10,8 +10,8 @@ module PurgatoryModule
     end
   end
 
-  def _for_review(requester = nil, options = {})
-    Review.new(self, requester, options)
+  def purgatize(requester = nil, options = {})
+    Purgatization.new(self, requester, options)
   end
 
   def purgatory!(requester = nil, options = {})
@@ -24,7 +24,7 @@ module PurgatoryModule
     attr_accessor :user_class_name
   end
 
-  class Review
+  class Purgatization
     def initialize(soul, requester, options)
       @soul = soul
       @requester = requester
