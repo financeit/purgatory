@@ -346,6 +346,16 @@ describe Purgatory do
         @purgatory.approve!(user2).should be_false
       end
     end
+
+    context "approving method call purgatory" do
+      before{create_method_call_purgatory}
+      it "should call the method" do
+        @widget.name.should == 'foo'
+        @purgatory.approve!
+        @widget.reload
+        @widget.name.should == 'bar'
+      end
+    end
   end
 
   describe "use_purgatory" do
@@ -552,6 +562,57 @@ describe Purgatory do
         end
       end
     end
+    context :purgatize do
+      context "putting method call into purgatory" do
+        context "valid changes" do
+          before {create_method_call_purgatory}
+          
+          it "should create and return pending Purgatory object" do
+            @purgatory.should be_present
+            @purgatory.should_not be_approved
+            @purgatory.should be_pending            
+            Purgatory.pending.count.should == 1
+            Purgatory.pending.first.should == @purgatory
+            Purgatory.approved.count.should be_zero            
+          end
+      
+          it "should store the soul, requester and performable_method" do
+            @purgatory.soul.should == @widget
+            @purgatory.requester.should == user1
+            @purgatory.performable_method[:method].should == :rename
+            @purgatory.performable_method[:args].should == ['bar']
+          end
+          
+          it "should delete old pending purgatories with same soul" do
+            @widget2 = Widget.create name: 'toy', price: 500
+            @widget2.name = 'Big Toy'
+            widget2_purgatory = @widget2.purgatize(user1).rename('bar')
+            @widget.name = 'baz'
+            new_purgatory = @widget.purgatize(user1).rename('bar')
+            Purgatory.find_by_id(@purgatory.id).should be_nil
+            Purgatory.find_by_id(widget2_purgatory.id).should be_present
+            Purgatory.pending.count.should == 2
+            Purgatory.last.requested_changes['name'].should == ['foo', 'baz'] 
+          end
+
+          it "should fail to create purgatory if matching pending Purgatory exists and fail_if_matching_soul is passed in" do
+            @widget.name = 'baz'
+            new_purgatory = @widget.purgatize(user1, fail_if_matching_soul: true).rename('bar')
+            new_purgatory.should be_nil
+            Purgatory.find_by_id(@purgatory.id).should be_present
+            Purgatory.pending.count.should == 1
+          end
+
+          it "should succeed to create purgatory if matching approved Purgatory exists and fail_if_matching_soul is passed in" do
+            @purgatory.approve!
+            @widget.name = 'baz'
+            new_purgatory = @widget.purgatize(user1, fail_if_matching_soul: true).rename('bar')
+            new_purgatory.should be_present
+            Purgatory.count.should == 2
+          end
+        end
+      end
+    end
   end
   
   private
@@ -561,6 +622,13 @@ describe Purgatory do
     @widget.name = 'bar'
     @widget.price = 200
     purgatory = @widget.purgatory! user1
+    @purgatory = Purgatory.find(purgatory.id)
+    @widget.reload
+  end
+
+  def create_method_call_purgatory
+    @widget = Widget.create name: 'foo', price: 100
+    purgatory = @widget.purgatize(user1).rename('bar')
     @purgatory = Purgatory.find(purgatory.id)
     @widget.reload
   end

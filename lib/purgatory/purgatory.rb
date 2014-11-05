@@ -11,6 +11,7 @@ class Purgatory < ActiveRecord::Base
 
   serialize :requested_changes
   serialize :attr_accessor_fields
+  serialize :performable_method
 
   def self.pending
     where(approved_at: nil)
@@ -37,14 +38,15 @@ class Purgatory < ActiveRecord::Base
   end
 
   def soul_with_changes
-    requested_changes.each{|k,v| soul.send(:write_attribute, k, v[1])}
-    attr_accessor_fields.each{|k,v| soul.instance_variable_set(k, v)}
+    requested_changes.each{|k,v| soul.send(:write_attribute, k, v[1])} if requested_changes
+    attr_accessor_fields.each{|k,v| soul.instance_variable_set(k, v)} if attr_accessor_fields
     soul
   end
 
   def approve!(approver = nil)
     return false if approved? 
     if soul_with_changes.save
+      soul.send(performable_method[:method],*performable_method[:args]) if performable_method
       self.approver = approver
       self.approved_at = Time.now
       self.soul_id = soul.id
