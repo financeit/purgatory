@@ -1,5 +1,6 @@
 require 'active_record'
 require 'generators/purgatory/templates/create_purgatories'
+require 'generators/purgatory/templates/add_performable_method_to_purgatories'
 require 'purgatory/purgatory_module'
 
 ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
@@ -31,6 +32,7 @@ ActiveRecord::Migration.create_table :items do |t|
 end
 
 CreatePurgatories.new.migrate(:up)
+AddPerformableMethodToPurgatories.new.migrate(:up)
 
 PurgatoryModule.configure do |config|
   config.user_class_name = 'User'
