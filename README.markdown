@@ -119,7 +119,15 @@ Here are some handy class and instance methods available to you:
     use_purgatory :local_attributes => :all
 
     By specifying all, Purgatory will programmatically determine what the virtual attributes are and save them when "purgatory!" is called, so that they will be available during "approve!".
-  
+
+## Updating Purgatory Version
+
+    Whenever you update the version of purgatory you will need to:
+    
+    1. Run the generator to create required migrations
+        $ rails generate purgatory
+    2. Migrate the database
+        $ rake db:migrate
 
 ## Contributing to Purgatory
  

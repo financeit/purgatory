@@ -17,7 +17,11 @@ class PurgatoryGenerator < Rails::Generators::Base
   end
 
   def create_migration_file
-    migration_template 'create_purgatories.rb', 'db/migrate/create_purgatories.rb'
+    ['create_purgatories', 'add_performable_method_to_purgatories'].each do |filename|
+      unless self.class.migration_exists?("db/migrate", "#{filename}").present?
+        migration_template "#{filename}.rb", "db/migrate/#{filename}.rb"
+      end
+    end
   end
 
   def create_initializer_file
