@@ -13,6 +13,8 @@ class Purgatory < ActiveRecord::Base
   serialize :attr_accessor_fields
   serialize :performable_method
 
+  attr_accessor :nested_attributes
+
   def self.pending
     where(approved_at: nil)
   end
@@ -38,7 +40,18 @@ class Purgatory < ActiveRecord::Base
   end
 
   def soul_with_changes
-    requested_changes.each{|k,v| soul.send(:write_attribute, k, v[1])} if requested_changes
+    if requested_changes
+      requested_changes.each do |k,v|
+        if v.is_a?(Hash) # Nested attribute
+          nested = soul.send("build_#{k}")
+          v.each do |k2, v2|
+            nested.send(:write_attribute, k2, v2[1])
+          end
+        elsif v.is_a?(Array) # Regular
+          soul.send(:write_attribute, k, v[1])
+        end
+      end
+    end
     attr_accessor_fields.each{|k,v| soul.instance_variable_set(k, v)} if attr_accessor_fields
     soul
   end
@@ -64,6 +77,11 @@ class Purgatory < ActiveRecord::Base
 
   def store_changes
     self.requested_changes = soul.changes
+    (nested_attributes || []).each do |nested_attribute|
+      nested_obj = soul.send(nested_attribute)
+      next if nested_obj.nil? || nested_obj.changes.empty?
+      self.requested_changes[nested_attribute.to_s] = nested_obj.changes
+    end
   end
 
   def destroy_pending_with_same_soul

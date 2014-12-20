@@ -1,4 +1,5 @@
 require 'purgatory/attribute_accessor_fields'
+require 'purgatory/nested_attribute_fields'
 
 module PurgatoryModule
   extend ActiveSupport::Concern
@@ -6,6 +7,7 @@ module PurgatoryModule
   module ClassMethods
     def use_purgatory(options={})
       AttributeAccessorFields.set_local_attributes_to_save(self,options[:local_attributes]) 
+      NestedAttributeFields.set_nested_attributes_to_save(self, options[:nested_attributes])
       self.has_many :purgatories, as: :soul
     end
   end
@@ -17,7 +19,7 @@ module PurgatoryModule
   def purgatory!(requester = nil, options = {})
     return nil if self.invalid?
     return nil if Purgatory.pending_with_matching_soul(self).any? && options[:fail_if_matching_soul]
-    Purgatory.create soul: self, requester: requester, attr_accessor_fields: AttributeAccessorFields.determine_attr_accessor_fields(self)
+    Purgatory.create soul: self, requester: requester, attr_accessor_fields: AttributeAccessorFields.determine_attr_accessor_fields(self), nested_attributes: NestedAttributeFields.get_nested_attributes_to_save(self)
   end
 
   class Configuration
