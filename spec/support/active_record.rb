@@ -17,6 +17,13 @@ ActiveRecord::Migration.create_table :users do |t|
   t.timestamps
 end
 
+ActiveRecord::Migration.create_table :addresses do |t|
+  t.string :city
+  t.string :province
+  t.integer :widget_id
+  t.timestamps
+end
+
 ActiveRecord::Migration.create_table :animals do |t|
   t.string :name
   t.string :type

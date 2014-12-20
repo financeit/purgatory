@@ -78,7 +78,9 @@ class Purgatory < ActiveRecord::Base
   def store_changes
     self.requested_changes = soul.changes
     (nested_attributes || []).each do |nested_attribute|
-      self.requested_changes[nested_attribute.to_s] = soul.send(nested_attribute).changes
+      nested_obj = soul.send(nested_attribute)
+      next if nested_obj.nil? || nested_obj.changes.empty?
+      self.requested_changes[nested_attribute.to_s] = nested_obj.changes
     end
   end
 

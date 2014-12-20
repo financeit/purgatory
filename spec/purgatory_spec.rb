@@ -1,5 +1,6 @@
 require 'support/active_record'
 require 'support/widget'
+require 'support/address'
 require 'support/user'
 require 'support/animal'
 require 'support/item'
@@ -29,6 +30,10 @@ describe Purgatory do
           @purgatory.requested_changes['name'].last.should == 'bar'
           @purgatory.requested_changes['price'].first.should == 100
           @purgatory.requested_changes['price'].last.should == 200
+          @purgatory.requested_changes['address']['city'].first.should == 'Toronto'
+          @purgatory.requested_changes['address']['city'].last.should == 'Montreal'
+          @purgatory.requested_changes['address']['province'].first.should == 'Ontario'
+          @purgatory.requested_changes['address']['province'].last.should == 'Quebec'
         end
 
         it "should return soul with changes if requested" do
@@ -135,6 +140,10 @@ describe Purgatory do
           @purgatory.requested_changes['name'].last.should == 'foo'
           @purgatory.requested_changes['price'].first.should == nil
           @purgatory.requested_changes['price'].last.should == 100
+          @purgatory.requested_changes['address']['city'].first.should == nil
+          @purgatory.requested_changes['address']['city'].last.should == 'Toronto'
+          @purgatory.requested_changes['address']['province'].first.should == nil
+          @purgatory.requested_changes['address']['province'].last.should == 'Ontario'
         end
     
         it "should not create a widget" do
@@ -221,6 +230,8 @@ describe Purgatory do
       it "should apply the changes" do
         @widget.name.should == 'bar'
         @widget.price.should == 200
+        @widget.address.city.should == 'Montreal'
+        @widget.address.province.should == 'Quebec'
       end
       
       it "should mark purgatory as approved and store approver" do
@@ -279,6 +290,9 @@ describe Purgatory do
         widget.name.should == 'foo'
         widget.price.should == 100
         widget.original_name.should == 'foo'
+        Address.count.should == 1
+        widget.address.city.should == 'Toronto'
+        widget.address.province.should == 'Ontario'
       end
       
       it "should mark purgatory as approved and store approver" do
@@ -619,8 +633,11 @@ describe Purgatory do
   
   def create_object_change_purgatory
     @widget = Widget.create name: 'foo', price: 100
+    Address.create widget_id: @widget.id, city: 'Toronto', province: 'Ontario'
     @widget.name = 'bar'
     @widget.price = 200
+    @widget.address.city = 'Montreal'
+    @widget.address.province = 'Quebec'
     purgatory = @widget.purgatory! user1
     @purgatory = Purgatory.find(purgatory.id)
     @widget.reload
@@ -635,6 +652,7 @@ describe Purgatory do
 
   def create_new_object_purgatory
     widget = Widget.new name: 'foo', price: 100
+    widget.build_address city: 'Toronto', province: 'Ontario'
     purgatory = widget.purgatory! user1
     @purgatory = Purgatory.find(purgatory.id)
   end
