@@ -27,7 +27,7 @@ To put your changes to an ActiveRecord class into Purgatory, simply make your ch
     item.price = 200
     purgatory = item.purgatory!(current_user) # returns the newly created purgatory or nil if the item's changes are invalid
 
-The first parameter passed to to `purgatory!` is called a *soul*.
+The object `purgatory!` is called on is known as its *soul*.
 
 By default, if you call `purgatory!` on an object then any pending purgatories whose soul is that same object will be destroyed. If you'd prefer this not to happen then you can pass `fail_if_matching_soul: true` as a parameter and this will make it so if there are pending purgatories with a matching soul then `purgatory!` will return `nil` and nothing will happen: 
 
