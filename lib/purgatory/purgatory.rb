@@ -61,7 +61,7 @@ def approve!(approver = nil)
     false
   end
 
-def self.pending_with_matching_soul(soul)
+  def self.pending_with_matching_soul(soul)
     pending.where("soul_id IS NOT NULL AND soul_id = ? AND soul_type = ?", soul.id, soul.class.base_class.name)
   end
 
