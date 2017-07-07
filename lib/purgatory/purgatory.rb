@@ -43,11 +43,15 @@ class Purgatory < ActiveRecord::Base
     soul
   end
 
-  def approve!(approver = nil)
-    return false if approved? 
-    if soul_with_changes.save
-      soul.send(performable_method[:method],*performable_method[:args]) if performable_method
-      return false if soul.errors.any?
+def approve!(approver = nil)
+    return false if approved?
+    success = nil
+    if requested_changes.any?
+      success = soul_with_changes.save
+    elsif performable_method
+      success = soul.send(performable_method[:method],*performable_method[:args])
+    end
+    if success
       self.approver = approver
       self.approved_at = Time.now
       self.soul_id = soul.id
@@ -57,7 +61,7 @@ class Purgatory < ActiveRecord::Base
     false
   end
 
-  def self.pending_with_matching_soul(soul)
+self.pending_with_matching_soul(soul)
     pending.where("soul_id IS NOT NULL AND soul_id = ? AND soul_type = ?", soul.id, soul.class.base_class.name)
   end
 
