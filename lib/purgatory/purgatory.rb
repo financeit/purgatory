@@ -43,7 +43,7 @@ class Purgatory < ActiveRecord::Base
     soul
   end
 
-def approve!(approver = nil)
+  def approve!(approver = nil)
     return false if approved?
     success = nil
     if requested_changes.any?
