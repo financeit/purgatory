@@ -240,7 +240,7 @@ describe Purgatory do
     context "approving a performable method" do
       before do
         create_method_call_purgatory
-        @purgatory.stubs(send(performable_method[:method], performable_method[:args])).returns(false)
+        @purgatory.soul.stubs(:send).returns(false)
 
       end
 
