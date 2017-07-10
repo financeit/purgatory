@@ -237,6 +237,18 @@ describe Purgatory do
       end
     end
 
+    context "approving a performable method" do
+      before do
+        create_method_call_purgatory
+        @purgatory.stubs(performable_method[:method]).returns(false)
+      end
+
+      it "should fail when performable method returns false" do
+        @purgatory.approve!(user2).should be_false
+      end
+    end
+
+
     context "approving object change purgatory with attr_accessor" do
       before do
         create_object_change_purgatory_with_attr_accessor
