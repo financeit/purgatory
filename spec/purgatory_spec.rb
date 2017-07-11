@@ -248,7 +248,6 @@ describe Purgatory do
       end
     end
 
-
     context "approving object change purgatory with attr_accessor" do
       before do
         create_object_change_purgatory_with_attr_accessor
