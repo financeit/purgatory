@@ -247,8 +247,8 @@ describe Purgatory do
         @purgatory.approve!(user2).should be_false
       end
 
-      it "it should not have approved_at/by attributes"
-        @purgatory.approved?.should be_false
+      it "it should not be approved"
+        @purgatory.should_not be_approved
     end
 
     context "approving object change purgatory with attr_accessor" do
