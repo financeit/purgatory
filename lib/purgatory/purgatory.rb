@@ -38,7 +38,7 @@ class Purgatory < ActiveRecord::Base
   end
 
   def soul_with_changes
-    requested_changes.each{|k,v| soul.send(:write_attribute, k, v[1])} if requested_changes
+    requested_changes.each{|k,v| soul.public_send(:write_attribute, k, v[1])} if requested_changes
     attr_accessor_fields.each{|k,v| soul.instance_variable_set(k, v)} if attr_accessor_fields
     soul
   end
@@ -46,10 +46,10 @@ class Purgatory < ActiveRecord::Base
   def approve!(approver = nil)
     return false if approved?
     success = nil
-    if requested_changes.any?
-      success = soul_with_changes.save
-    elsif performable_method
+    if performable_method.present?
       success = soul.send(performable_method[:method],*performable_method[:args])
+    else
+      success = soul_with_changes.save
     end
     if success
       self.approver = approver

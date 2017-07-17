@@ -246,6 +246,10 @@ describe Purgatory do
       it "should fail when performable method returns false" do
         @purgatory.approve!(user2).should be_false
       end
+
+      it "it should not have approved_at/by attributes"
+        @purgatory.approved_at.present?.should be_false
+        @purgatory.approved_by.present?.should be_false
     end
 
     context "approving object change purgatory with attr_accessor" do
