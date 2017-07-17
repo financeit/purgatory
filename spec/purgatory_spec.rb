@@ -240,7 +240,7 @@ describe Purgatory do
     context "approving a performable method" do
       before do
         create_method_call_purgatory
-        @purgatory.soul.stub(:send).and_return(false)
+        @purgatory.soul.stub(:public_send).and_return(false)
       end
 
       it "should fail when performable method returns false" do
@@ -248,8 +248,7 @@ describe Purgatory do
       end
 
       it "it should not have approved_at/by attributes"
-        @purgatory.approved_at.present?.should be_false
-        @purgatory.approved_by.present?.should be_false
+        @purgatory.approved?.should be_false
     end
 
     context "approving object change purgatory with attr_accessor" do
