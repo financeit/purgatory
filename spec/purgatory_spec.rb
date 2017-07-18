@@ -240,7 +240,14 @@ describe Purgatory do
     context "approving a performable method" do
       before do
         create_method_call_purgatory
-        @widget.stub(:rename, 'bar').and_return(false)
+        @purgatory.soul.stub(:rename).and_return(false)
+      end
+
+      it "should store the soul, requester and performable_method" do
+        @purgatory.soul.should == @widget
+        @purgatory.requester.should == user1
+        @purgatory.performable_method[:method].should == :rename
+        @purgatory.performable_method[:args].should == ['bar']
       end
 
       it "should fail when performable method returns false" do
@@ -690,3 +697,4 @@ describe Purgatory do
     Class.new(klass)  
   end
 end
+
