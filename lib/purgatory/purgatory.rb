@@ -45,7 +45,6 @@ class Purgatory < ActiveRecord::Base
 
   def approve!(approver = nil)
     return false if approved?
-    success = nil
     if performable_method.present?
       success = soul.public_send(performable_method[:method],*performable_method[:args])
     else

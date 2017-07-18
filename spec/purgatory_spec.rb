@@ -240,7 +240,7 @@ describe Purgatory do
     context "approving a performable method" do
       before do
         create_method_call_purgatory
-        @purgatory.soul.stub(:public_send).and_return(false)
+        @widget.stub(:rename, 'foo').and_return(false)
       end
 
       it "should fail when performable method returns false" do
@@ -248,9 +248,9 @@ describe Purgatory do
       end
 
       it "it should not be approved" do
-      @purgatory.should be_present
-      @purgatory.should_not be_approved
-      @purgatory.should be_pending
+        @purgatory.should be_present
+        @purgatory.should_not be_approved
+        @purgatory.should be_pending
       end
     end
 
