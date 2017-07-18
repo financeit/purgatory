@@ -237,7 +237,7 @@ describe Purgatory do
       end
     end
 
-    context "approving a performable method" do
+    context "approving a performable method that returns false" do
       before do
         create_method_call_purgatory
         @purgatory.soul.stub(:rename).and_return(false)
