@@ -240,7 +240,7 @@ describe Purgatory do
     context "approving a performable method" do
       before do
         create_method_call_purgatory
-        @widget.stub(:rename, 'foo').and_return(false)
+        @widget.stub(:rename, 'bar').and_return(false)
       end
 
       it "should fail when performable method returns false" do
