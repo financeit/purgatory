@@ -41,7 +41,7 @@ You can also put the creation of a new object into Purgatory
     item = Item.new price: 100
     purgatory = item.purgatory!
 
-Call .purgatize.method(params) to put a method call into Purgatory. When the purgatory is approved the method will be called on the soul
+Call .purgatize.method(params) to put a method call into Purgatory. When the purgatory is approved the method will be called on the soul. The purgatory will only be approved if the method returns true to indicate it succeeded.
 
     #without purgatory:
     item.increase_price(200)
@@ -57,7 +57,7 @@ The following are some attributes of a purgatory:
     purgatory.requested_changes # A hash of the proposed changes. The keys are the attribute names and the values are 2-element arrays where the 1st element is the old value and the 2nd element is the new value
     purgatory.approver # The user who approved the purgatory
     purgatory.approved_at # The time when the purgatory was approved
-    purgatory.performable_method # Information about the method to call on the soul when the purgatory is approved
+    purgatory.performable_method # Information about the method to call on the soul when the purgatory is approved. Performable methods should return true if they succeed.
 
 Here are some handy class and instance methods available to you:
 

@@ -44,9 +44,13 @@ class Purgatory < ActiveRecord::Base
   end
 
   def approve!(approver = nil)
-    return false if approved? 
-    if soul_with_changes.save
-      soul.send(performable_method[:method],*performable_method[:args]) if performable_method
+    return false if approved?
+    if performable_method.present?
+      success = soul.send(performable_method[:method], *performable_method[:args])
+    else
+      success = soul_with_changes.save
+    end
+    if success
       self.approver = approver
       self.approved_at = Time.now
       self.soul_id = soul.id
