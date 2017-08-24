@@ -44,20 +44,22 @@ class Purgatory < ActiveRecord::Base
   end
 
   def approve!(approver = nil)
-    return false if approved?
-    success = soul_with_changes.save
-    if performable_method.present? && success
-      success = soul.send(performable_method[:method],*performable_method[:args])
-    end
+    self.with_lock do
+      return false if approved?
+      success = soul_with_changes.save
+      if performable_method.present? && success
+        success = soul.send(performable_method[:method],*performable_method[:args])
+      end
 
-    if success
-      self.approver = approver
-      self.approved_at = Time.now
-      self.soul_id = soul.id
-      save
-      return true
+      if success
+        self.approver = approver
+        self.approved_at = Time.now
+        self.soul_id = soul.id
+        save
+        return true
+      end
+      false
     end
-    false
   end
 
   def self.pending_with_matching_soul(soul)
