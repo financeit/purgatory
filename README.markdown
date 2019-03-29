@@ -25,13 +25,15 @@ To put your changes to an ActiveRecord class into Purgatory, simply make your ch
 
     item = Item.find(10)
     item.price = 200
-    purgatory = item.purgatory!(current_user) # returns the newly created purgatory or nil if the item is changes are invalid
+    purgatory = item.purgatory!(current_user) # returns the newly created purgatory or nil if the item's changes are invalid
 
-By default, if you call purgatory! on an object then any pending purgatories whose soul is that same object will be destroyed. If you'd prefer this not to happen then you can pass fail_if_matching_soul as a parameter and this will make it so if there are pending purgatories with a matching soul then purgatory! will return nil and nothing will happen: 
+The object `purgatory!` is called on is known as its *soul*.
+
+By default, if you call `purgatory!` on an object then any pending purgatories whose soul is that same object will be destroyed. If you'd prefer this not to happen then you can pass `fail_if_matching_soul: true` as a parameter and this will make it so if there are pending purgatories with a matching soul then `purgatory!` will return `nil` and nothing will happen: 
 
     purgatory = item.purgatory!(current_user, fail_if_matching_soul: true) # Returns nil and does nothing if there is already a pending purgatory on same soul
 
-To apply the changes, simply call the approve! method on the associated Pergatory instance. You can pass in the approving user as an optional parameter
+To apply the changes, simply call the `approve!` method on the associated `Purgatory` instance. You can pass in the approving user as an optional parameter:
 
     purgatory = item.purgatories.last
     purgatory.approve!(current_user) # returns a boolean for whether or not this succeeded
@@ -41,12 +43,12 @@ You can also put the creation of a new object into Purgatory
     item = Item.new price: 100
     purgatory = item.purgatory!
 
-Call .purgatize.method(params) to put a method call into Purgatory. When the purgatory is approved the method will be called on the soul. The purgatory will only be approved if the method returns true to indicate it succeeded.
+Call `.purgatize.method(params)` to put a method call into Purgatory. When the purgatory is approved the method will be called on the soul.  The purgatory will only be approved if the method returns true to indicate it succeeded.
 
-    #without purgatory:
+    # without purgatory:
     item.increase_price(200)
 
-    #with purgatory:
+    # with purgatory:
     item.purgatize(current_user).increase_price(200)
 
 The following are some attributes of a purgatory:
@@ -64,8 +66,8 @@ Here are some handy class and instance methods available to you:
     ### Class methods
     Purgatory.pending # Returns a relation of all pending purgatories
     Purgatory.approved # Returns a relation of all approved purgatories
-    Purgatory.pending_with_matching_soul(soul) # Returns a relation of
-    all pending purgatories with soul matching the object passed in
+    Purgatory.pending_with_matching_soul(soul) # Returns a relation of all pending purgatories
+                                               # with soul matching the object passed in
 
     ### Instance methods
     purgatory.pending? # Returns true if the purgatory is pending, false otherwise
@@ -110,13 +112,13 @@ Here are some handy class and instance methods available to you:
 
   1. Manual 
   
-    use_purgatory :local_attributes => [:foo, :bar]
+    `use_purgatory :local_attributes => [:foo, :bar]`
 
     When you pass a hash that contains a list of virtual attributes that you want to save, purgatory will save the values of these attributes into the purgatory table during the "purgatory!" phase, so that when "approve!" is later called, the virtual attributes will be retrieved and will continue to be available in the remaining activerecord lifecyle.
 
   2. Automatic 
 
-    use_purgatory :local_attributes => :all
+    `use_purgatory :local_attributes => :all`
 
     By specifying all, Purgatory will programmatically determine what the virtual attributes are and save them when "purgatory!" is called, so that they will be available during "approve!".
 
