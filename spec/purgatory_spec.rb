@@ -237,6 +237,30 @@ describe Purgatory do
       end
     end
 
+    context "approving a performable method that returns false" do
+      before do
+        create_method_call_purgatory
+        @purgatory.soul.stub(:rename).and_return(false)
+      end
+
+      it "should store the soul, requester and performable_method" do
+        @purgatory.soul.should == @widget
+        @purgatory.requester.should == user1
+        @purgatory.performable_method[:method].should == :rename
+        @purgatory.performable_method[:args].should == ['bar']
+      end
+
+      it "should fail when performable method returns false" do
+        @purgatory.approve!(user2).should be_false
+      end
+
+      it "it should not be approved" do
+        @purgatory.should be_present
+        @purgatory.should_not be_approved
+        @purgatory.should be_pending
+      end
+    end
+
     context "approving object change purgatory with attr_accessor" do
       before do
         create_object_change_purgatory_with_attr_accessor
@@ -673,3 +697,4 @@ describe Purgatory do
     Class.new(klass)  
   end
 end
+
