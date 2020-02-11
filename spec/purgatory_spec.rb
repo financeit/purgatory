@@ -214,7 +214,7 @@ describe Purgatory do
     context "approving object change purgatory" do
       before do
         create_object_change_purgatory
-        @purgatory.approve!(user2).should be_true
+        @purgatory.approve!(user2).should be true
         @widget.reload
       end
       
@@ -233,7 +233,7 @@ describe Purgatory do
       end
       
       it "should fail if you try to approve again" do
-        @purgatory.approve!(user2).should be_false
+        @purgatory.approve!(user2).should be false
       end
     end
 
@@ -251,7 +251,7 @@ describe Purgatory do
       end
 
       it "should fail when performable method returns false" do
-        @purgatory.approve!(user2).should be_false
+        @purgatory.approve!(user2).should be false
       end
 
       it "it should not be approved" do
@@ -287,14 +287,14 @@ describe Purgatory do
       end
       
       it "should fail if you try to approve again" do
-        @purgatory.approve!(user2).should be_false
+        @purgatory.approve!(user2).should be false
       end
     end
     
     context "approving new object creation" do
       before do
         create_new_object_purgatory
-        @purgatory.approve!(user2).should be_true
+        @purgatory.approve!(user2).should be true
       end
       
       it "should create the new object and apply any callbacks" do
@@ -321,14 +321,14 @@ describe Purgatory do
       end
       
       it "should fail if you try to approve again" do
-        @purgatory.approve!(user2).should be_false
+        @purgatory.approve!(user2).should be false
       end
     end
 
     context "approving new object creation using STI" do
       before do
         create_new_object_purgatory_with_sti
-        @purgatory.approve!(user2).should be_true
+        @purgatory.approve!(user2).should be true
       end
       
       it "should create the new object and apply any callbacks" do
@@ -367,7 +367,7 @@ describe Purgatory do
       end
       
       it "should fail if you try to approve again" do
-        @purgatory.approve!(user2).should be_false
+        @purgatory.approve!(user2).should be false
       end
     end
 
