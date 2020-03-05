@@ -23,7 +23,6 @@ Gem::Specification.new do |s|
     "Gemfile.lock",
     "LICENSE.txt",
     "README.markdown",
-    "Rakefile",
     "VERSION",
     "init.rb",
     "lib/generators/purgatory/purgatory_generator.rb",
