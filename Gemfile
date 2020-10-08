@@ -4,7 +4,7 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 group :test do
-  gem "activerecord", "~> 4.1"
+  gem "activerecord", "~> 6.0"
   gem "rspec"
   gem "sqlite3"
   gem "pry"
