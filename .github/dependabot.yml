@@ -1,0 +1,17 @@
+version: 2
+updates:
+- package-ecosystem: bundler
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "10:00"
+  open-pull-requests-limit: 22
+  ignore:
+  - dependency-name: activerecord
+    versions:
+    - 6.1.1
+    - 6.1.2
+  - dependency-name: pry
+    versions:
+    - 0.13.1
+    - 0.14.0
