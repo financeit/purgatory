@@ -31,9 +31,9 @@ module PurgatoryModule
       @options = options
     end
 
-    def method_missing(method, *args)
+    def method_missing(method, *args, **kwargs)
       return nil if Purgatory.pending_with_matching_soul(@soul).any? && @options[:fail_if_matching_soul]
-      Purgatory.create soul: @soul, requester: @requester, performable_method: {method: method.to_sym, args: args}
+      Purgatory.create soul: @soul, requester: @requester, performable_method: { method: method.to_sym, args: args, kwargs: kwargs }
     end
   end
 
