@@ -16,7 +16,7 @@ class Purgatory < ActiveRecord::Base
   def self.pending
     where(approved_at: nil)
   end
-  
+
   def self.approved
     where ["approved_at IS NOT NULL"]
   end
@@ -51,6 +51,7 @@ class Purgatory < ActiveRecord::Base
       unless approved?
         success = soul_with_changes.save
         if performable_method.present? && success
+          performable_method[:kwargs] ||= {}
           success = soul.send(performable_method[:method], *performable_method[:args], **performable_method[:kwargs])
         end
 
