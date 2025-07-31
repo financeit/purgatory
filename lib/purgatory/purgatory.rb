@@ -34,7 +34,12 @@ class Purgatory < ActiveRecord::Base
   end
 
   def sti_class
-    requested_changes['type'].try(:last)
+    read_attribute(:requested_changes)['type'].try(:last)
+  end
+
+  # Deserialize encrypted attributes on read
+  def requested_changes
+    alter(super, :deserialize)
   end
 
   def soul_with_changes
@@ -74,7 +79,20 @@ class Purgatory < ActiveRecord::Base
   private
 
   def store_changes
-    self.requested_changes = soul.changes
+    # Store the ciphertext of encrypted attributes
+    self.requested_changes = alter(soul.changes, :serialize)
+  end
+
+  def alter(changes, serialization_method)
+    encrypted_attr_changes = changes.slice(*soul.class.encrypted_attributes)
+    return changes if encrypted_attr_changes.empty?
+
+    altered = encrypted_attr_changes.each_with_object({}) do |(attribute_name, attr_changes), hsh|
+      type = soul.class.type_for_attribute(attribute_name)
+      hsh[attribute_name] = attr_changes.map { |value| type.send(serialization_method, value) }
+    end
+
+    changes.merge(altered)
   end
 
   def destroy_pending_with_same_soul

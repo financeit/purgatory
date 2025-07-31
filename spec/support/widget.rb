@@ -5,6 +5,8 @@ class Widget < ActiveRecord::Base
   validates :name, presence: true
   before_create :set_original_name
   
+  encrypts :token
+
   def rename(new_name)
     self.update(name: new_name)
   end

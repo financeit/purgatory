@@ -37,6 +37,17 @@ describe Purgatory do
           expect(soul_with_changes.price).to eq(200)
         end
     
+        it "should store attributes encrypted, but decrypt on access" do
+          raw_value = @purgatory.read_attribute(:requested_changes)
+          expect(raw_value['token']).to match([a_string_matching(/\A\{/), a_string_matching(/\A\{/)])
+
+          processed_value = @purgatory.requested_changes
+          expect(processed_value['token']).to eq(['tk_123', 'tk_456'])
+
+          soul_with_changes = @purgatory.soul_with_changes
+          expect(soul_with_changes.token).to eq('tk_456')
+        end
+
         it "should not change the widget" do
           expect(@widget.name).to eq('foo')
           expect(@widget.price).to eq(100)
@@ -127,6 +138,17 @@ describe Purgatory do
           widget = @purgatory.soul
           expect(widget.class).to eq(Widget)
           expect(widget).to be_new_record
+        end
+
+        it "should store attributes encrypted, but decrypt on access" do
+          raw_value = @purgatory.read_attribute(:requested_changes)
+          expect(raw_value['token']).to match([nil, a_string_matching(/\A\{/)])
+
+          processed_value = @purgatory.requested_changes
+          expect(processed_value['token']).to eq([nil, 'tk_123'])
+
+          soul_with_changes = @purgatory.soul_with_changes
+          expect(soul_with_changes.token).to eq('tk_123')
         end
         
         it "should store the requester and requested changes" do
@@ -642,9 +664,10 @@ describe Purgatory do
   private
   
   def create_object_change_purgatory
-    @widget = Widget.create name: 'foo', price: 100
+    @widget = Widget.create name: 'foo', price: 100, token: 'tk_123'
     @widget.name = 'bar'
     @widget.price = 200
+    @widget.token = 'tk_456'
     purgatory = @widget.purgatory! user1
     @purgatory = Purgatory.find(purgatory.id)
     @widget.reload
@@ -658,7 +681,7 @@ describe Purgatory do
   end
 
   def create_new_object_purgatory
-    widget = Widget.new name: 'foo', price: 100
+    widget = Widget.new name: 'foo', price: 100, token: 'tk_123'
     purgatory = widget.purgatory! user1
     @purgatory = Purgatory.find(purgatory.id)
   end
