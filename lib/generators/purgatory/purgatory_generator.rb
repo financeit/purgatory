@@ -9,7 +9,7 @@ class PurgatoryGenerator < Rails::Generators::Base
   end
 
   def self.next_migration_number(dirname)
-    if ActiveRecord::Base.timestamped_migrations
+    if ActiveRecord.timestamped_migrations
       Time.new.utc.strftime("%Y%m%d%H%M%S")
     else
       "%.3d" % (current_migration_number(dirname) + 1)
@@ -19,9 +19,13 @@ class PurgatoryGenerator < Rails::Generators::Base
   def create_migration_file
     ['create_purgatories', 'add_performable_method_to_purgatories'].each do |filename|
       unless self.class.migration_exists?("db/migrate", "#{filename}").present?
-        migration_template "#{filename}.rb", "db/migrate/#{filename}.rb"
+        migration_template "#{filename}.rb.erb", "db/migrate/#{filename}.rb"
       end
     end
+  end
+
+  def migration_version
+    format("[%d.%d]", ActiveRecord::VERSION::MAJOR, ActiveRecord::VERSION::MINOR)
   end
 
   def create_initializer_file

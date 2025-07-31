@@ -1,0 +1,5 @@
+class AddPerformableMethodToPurgatories < ActiveRecord::Migration<%= migration_version %>
+  def change
+    add_column :purgatories, :performable_method, :text
+  end
+end

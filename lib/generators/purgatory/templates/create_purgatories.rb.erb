@@ -1,4 +1,4 @@
-class CreatePurgatories < ActiveRecord::Migration
+class CreatePurgatories < ActiveRecord::Migration<%= migration_version %>
   def change
     create_table :purgatories do |t|
       t.integer :soul_id
