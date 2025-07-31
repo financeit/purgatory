@@ -14,37 +14,37 @@ describe Purgatory do
         before {create_object_change_purgatory}
         
         it "should create and return pending Purgatory object" do
-          @purgatory.should be_present
-          @purgatory.should_not be_approved
-          @purgatory.should be_pending            
-          Purgatory.pending.count.should == 1
-          Purgatory.pending.first.should == @purgatory
-          Purgatory.approved.count.should be_zero            
+          expect(@purgatory).to be_present
+          expect(@purgatory).not_to be_approved
+          expect(@purgatory).to be_pending
+          expect(Purgatory.pending.count).to eq(1)
+          expect(Purgatory.pending.first).to eq(@purgatory)
+          expect(Purgatory.approved.count).to be_zero
         end
     
         it "should store the soul, requester and requested changes" do
-          @purgatory.soul.should == @widget
-          @purgatory.requester.should == user1
-          @purgatory.requested_changes['name'].first.should == 'foo'
-          @purgatory.requested_changes['name'].last.should == 'bar'
-          @purgatory.requested_changes['price'].first.should == 100
-          @purgatory.requested_changes['price'].last.should == 200
+          expect(@purgatory.soul).to eq(@widget)
+          expect(@purgatory.requester).to eq(user1)
+          expect(@purgatory.requested_changes['name'].first).to eq('foo')
+          expect(@purgatory.requested_changes['name'].last).to eq('bar')
+          expect(@purgatory.requested_changes['price'].first).to eq(100)
+          expect(@purgatory.requested_changes['price'].last).to eq(200)
         end
 
         it "should return soul with changes if requested" do
           soul_with_changes = @purgatory.soul_with_changes
-          soul_with_changes.name.should == 'bar'
-          soul_with_changes.price.should == 200
+          expect(soul_with_changes.name).to eq('bar')
+          expect(soul_with_changes.price).to eq(200)
         end
     
         it "should not change the widget" do
-          @widget.name.should == 'foo'
-          @widget.price.should == 100
+          expect(@widget.name).to eq('foo')
+          expect(@widget.price).to eq(100)
         end
     
         it "should allow the widget to access its purgatories" do
-          @widget.purgatories.count.should == 1
-          @widget.purgatories.first.should == @purgatory
+          expect(@widget.purgatories.count).to eq(1)
+          expect(@widget.purgatories.first).to eq(@purgatory)
         end
 
         it "should delete old pending purgatories with same soul" do
@@ -53,26 +53,26 @@ describe Purgatory do
           widget2_purgatory = @widget2.purgatory! user1
           @widget.name = 'baz'
           new_purgatory = @widget.purgatory! user1
-          Purgatory.find_by_id(@purgatory.id).should be_nil
-          Purgatory.find_by_id(widget2_purgatory.id).should be_present
-          Purgatory.pending.count.should == 2
-          Purgatory.last.requested_changes['name'].should == ['foo', 'baz'] 
+          expect(Purgatory.find_by_id(@purgatory.id)).to be_nil
+          expect(Purgatory.find_by_id(widget2_purgatory.id)).to be_present
+          expect(Purgatory.pending.count).to eq(2)
+          expect(Purgatory.last.requested_changes['name']).to eq(['foo', 'baz'])
         end
 
         it "should fail to create purgatory if matching pending Purgatory exists and fail_if_matching_soul is passed in" do
           @widget.name = 'baz'
           new_purgatory = @widget.purgatory! user1, fail_if_matching_soul: true
-          new_purgatory.should be_nil
-          Purgatory.find_by_id(@purgatory.id).should be_present
-          Purgatory.pending.count.should == 1
+          expect(new_purgatory).to be_nil
+          expect(Purgatory.find_by_id(@purgatory.id)).to be_present
+          expect(Purgatory.pending.count).to eq(1)
         end
 
         it "should succeed to create purgatory if matching approved Purgatory exists and fail_if_matching_soul is passed in" do
           @purgatory.approve!
           @widget.name = 'baz'
           new_purgatory = @widget.purgatory! user1, fail_if_matching_soul: true
-          new_purgatory.should be_present
-          Purgatory.count.should == 2
+          expect(new_purgatory).to be_present
+          expect(Purgatory.count).to eq(2)
         end
       end
 
@@ -83,30 +83,30 @@ describe Purgatory do
         end
 
         it "should not change the object" do
-          @item.name.should == 'foo'
-          @item.price.should == 100
+          expect(@item.name).to eq('foo')
+          expect(@item.price).to eq(100)
         end
 
         it "should not save attr_accessor variable of object" do
-          @item.dante.should == nil
+          expect(@item.dante).to eq(nil)
         end
 
         it "should store the attr_accessor variables in the Purgatory object" do
-          @purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
+          expect(@purgatory.attr_accessor_fields).to eq({ :@dante => "inferno" })
         end
 
         it "should return item with changed attr_accessor if requested" do
-          @purgatory.soul_with_changes.dante.should == 'inferno'
+          expect(@purgatory.soul_with_changes.dante).to eq('inferno')
         end
       end
     
       it "should not allow invalid changes to be put into purgatory" do
         widget = Widget.create name: 'foo'
         widget.name = ''
-        widget.purgatory!(user1).should be_nil      
+        expect(widget.purgatory!(user1)).to be_nil
         widget.reload
-        widget.name.should == 'foo'
-        Purgatory.count.should be_zero
+        expect(widget.name).to eq('foo')
+        expect(Purgatory.count).to be_zero
       end
     end
     
@@ -115,30 +115,30 @@ describe Purgatory do
         before {create_new_object_purgatory}
     
         it "should create and return pending Purgatory object" do
-          @purgatory.should be_present
-          @purgatory.should_not be_approved
-          @purgatory.should be_pending            
-          Purgatory.pending.count.should == 1
-          Purgatory.pending.first.should == @purgatory
-          Purgatory.approved.count.should be_zero            
+          expect(@purgatory).to be_present
+          expect(@purgatory).not_to be_approved
+          expect(@purgatory).to be_pending
+          expect(Purgatory.pending.count).to eq(1)
+          expect(Purgatory.pending.first).to eq(@purgatory)
+          expect(Purgatory.approved.count).to be_zero
         end
         
         it "should return the soul as a new instance of the purgatoried class" do
           widget = @purgatory.soul
-          widget.class.should == Widget
-          widget.should be_new_record
+          expect(widget.class).to eq(Widget)
+          expect(widget).to be_new_record
         end
         
         it "should store the requester and requested changes" do
-          @purgatory.requester.should == user1
-          @purgatory.requested_changes['name'].first.should == nil
-          @purgatory.requested_changes['name'].last.should == 'foo'
-          @purgatory.requested_changes['price'].first.should == nil
-          @purgatory.requested_changes['price'].last.should == 100
+          expect(@purgatory.requester).to eq(user1)
+          expect(@purgatory.requested_changes['name'].first).to eq(nil)
+          expect(@purgatory.requested_changes['name'].last).to eq('foo')
+          expect(@purgatory.requested_changes['price'].first).to eq(nil)
+          expect(@purgatory.requested_changes['price'].last).to eq(100)
         end
     
         it "should not create a widget" do
-          Widget.count.should be_zero
+          expect(Widget.count).to be_zero
         end
       end
 
@@ -146,28 +146,28 @@ describe Purgatory do
         before {create_new_object_purgatory_with_sti}
     
         it "should create and return pending Purgatory object" do
-          @purgatory.should be_present
-          @purgatory.should_not be_approved
-          @purgatory.should be_pending            
-          Purgatory.pending.count.should == 1
-          Purgatory.pending.first.should == @purgatory
-          Purgatory.approved.count.should be_zero            
+          expect(@purgatory).to be_present
+          expect(@purgatory).not_to be_approved
+          expect(@purgatory).to be_pending
+          expect(Purgatory.pending.count).to eq(1)
+          expect(Purgatory.pending.first).to eq(@purgatory)
+          expect(Purgatory.approved.count).to be_zero
         end
         
         it "should return the soul as a new instance of the purgatoried class" do
           dog = @purgatory.soul
-          dog.class.should == Dog
-          dog.should be_new_record
+          expect(dog.class).to eq(Dog)
+          expect(dog).to be_new_record
         end
         
         it "should store the requester and requested changes" do
-          @purgatory.requester.should == user1
-          @purgatory.requested_changes['name'].first.should == nil
-          @purgatory.requested_changes['name'].last.should == 'doggy'
+          expect(@purgatory.requester).to eq(user1)
+          expect(@purgatory.requested_changes['name'].first).to eq(nil)
+          expect(@purgatory.requested_changes['name'].last).to eq('doggy')
         end
     
         it "should not create a dog" do
-          Dog.count.should be_zero
+          expect(Dog.count).to be_zero
         end
       end
 
@@ -175,11 +175,11 @@ describe Purgatory do
         before {create_object_change_purgatory_with_sti}
 
         it "should delete old purgatory on object if new one is created" do
-          Purgatory.count.should == 1
+          expect(Purgatory.count).to eq(1)
           @dog.name = 'fluffy'
           @dog.purgatory!(user1)
-          Purgatory.last.requested_changes['name'].last.should == 'fluffy'
-          Purgatory.count.should == 1
+          expect(Purgatory.last.requested_changes['name'].last).to eq('fluffy')
+          expect(Purgatory.count).to eq(1)
         end
       end
     
@@ -189,23 +189,23 @@ describe Purgatory do
         end
 
         it "should store the attr_accessor variables in the Purgatory object" do
-          @purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
+          expect(@purgatory.attr_accessor_fields).to eq({ :@dante => "inferno" })
         end
 
         it "should store the requester and requested changes" do
-          @purgatory.requester.should == user1
-          @purgatory.requested_changes['name'].first.should == nil
-          @purgatory.requested_changes['name'].last.should == 'foo'
-          @purgatory.requested_changes['price'].first.should == nil
-          @purgatory.requested_changes['price'].last.should == 100
+          expect(@purgatory.requester).to eq(user1)
+          expect(@purgatory.requested_changes['name'].first).to eq(nil)
+          expect(@purgatory.requested_changes['name'].last).to eq('foo')
+          expect(@purgatory.requested_changes['price'].first).to eq(nil)
+          expect(@purgatory.requested_changes['price'].last).to eq(100)
         end
       end
 
       it "should not allow invalid object creation to be put into purgatory" do
         widget = Widget.new name: ''
-        widget.purgatory!(user1).should be_nil      
-        Purgatory.count.should be_zero
-        Widget.count.should be_zero
+        expect(widget.purgatory!(user1)).to be_nil
+        expect(Purgatory.count).to be_zero
+        expect(Widget.count).to be_zero
       end
     end
   end
@@ -214,50 +214,50 @@ describe Purgatory do
     context "approving object change purgatory" do
       before do
         create_object_change_purgatory
-        @purgatory.approve!(user2).should be true
+        expect(@purgatory.approve!(user2)).to be true
         @widget.reload
       end
       
       it "should apply the changes" do
-        @widget.name.should == 'bar'
-        @widget.price.should == 200
+        expect(@widget.name).to eq('bar')
+        expect(@widget.price).to eq(200)
       end
       
       it "should mark purgatory as approved and store approver" do
-        @purgatory.approver.should == user2
-        @purgatory.should be_approved
-        @purgatory.should_not be_pending            
-        Purgatory.pending.count.should be_zero
-        Purgatory.approved.count.should == 1
-        Purgatory.approved.first.should == @purgatory
+        expect(@purgatory.approver).to eq(user2)
+        expect(@purgatory).to be_approved
+        expect(@purgatory).not_to be_pending
+        expect(Purgatory.pending.count).to be_zero
+        expect(Purgatory.approved.count).to eq(1)
+        expect(Purgatory.approved.first).to eq(@purgatory)
       end
       
       it "should fail if you try to approve again" do
-        @purgatory.approve!(user2).should be false
+        expect(@purgatory.approve!(user2)).to be false
       end
     end
 
     context "approving a performable method that returns false" do
       before do
         create_method_call_purgatory
-        @purgatory.soul.stub(:rename).and_return(false)
+        allow(@purgatory.soul).to receive(:rename).and_return(false)
       end
 
       it "should store the soul, requester and performable_method" do
-        @purgatory.soul.should == @widget
-        @purgatory.requester.should == user1
-        @purgatory.performable_method[:method].should == :rename
-        @purgatory.performable_method[:args].should == ['bar']
+        expect(@purgatory.soul).to eq(@widget)
+        expect(@purgatory.requester).to eq(user1)
+        expect(@purgatory.performable_method[:method]).to eq(:rename)
+        expect(@purgatory.performable_method[:args]).to eq(['bar'])
       end
 
       it "should fail when performable method returns false" do
-        @purgatory.approve!(user2).should be false
+        expect(@purgatory.approve!(user2)).to be false
       end
 
       it "it should not be approved" do
-        @purgatory.should be_present
-        @purgatory.should_not be_approved
-        @purgatory.should be_pending
+        expect(@purgatory).to be_present
+        expect(@purgatory).not_to be_approved
+        expect(@purgatory).to be_pending
       end
     end
 
@@ -269,74 +269,74 @@ describe Purgatory do
       end
 
       it "should apply the changes" do
-        @item.name.should == 'bar'
-        @item.price.should == 200
+        expect(@item.name).to eq('bar')
+        expect(@item.price).to eq(200)
       end
 
       it "should apply changes that depend on attr_accessor instance_variable" do
-        @item.original_name.should == "inferno"
+        expect(@item.original_name).to eq("inferno")
       end
       
       it "should mark purgatory as approved and store approver" do
-        @purgatory.approver.should == user2
-        @purgatory.should be_approved
-        @purgatory.should_not be_pending            
-        Purgatory.pending.count.should be_zero
-        Purgatory.approved.count.should == 1
-        Purgatory.approved.first.should == @purgatory
+        expect(@purgatory.approver).to eq(user2)
+        expect(@purgatory).to be_approved
+        expect(@purgatory).not_to be_pending
+        expect(Purgatory.pending.count).to be_zero
+        expect(Purgatory.approved.count).to eq(1)
+        expect(Purgatory.approved.first).to eq(@purgatory)
       end
       
       it "should fail if you try to approve again" do
-        @purgatory.approve!(user2).should be false
+        expect(@purgatory.approve!(user2)).to be false
       end
     end
     
     context "approving new object creation" do
       before do
         create_new_object_purgatory
-        @purgatory.approve!(user2).should be true
+        expect(@purgatory.approve!(user2)).to be true
       end
       
       it "should create the new object and apply any callbacks" do
-        Widget.count.should == 1
+        expect(Widget.count).to eq(1)
         widget = Widget.first
-        widget.name.should == 'foo'
-        widget.price.should == 100
-        widget.original_name.should == 'foo'
+        expect(widget.name).to eq('foo')
+        expect(widget.price).to eq(100)
+        expect(widget.original_name).to eq('foo')
       end
       
       it "should mark purgatory as approved and store approver" do
-        @purgatory.approver.should == user2
-        @purgatory.should be_approved
-        @purgatory.should_not be_pending            
-        Purgatory.pending.count.should be_zero
-        Purgatory.approved.count.should == 1
-        Purgatory.approved.first.should == @purgatory
+        expect(@purgatory.approver).to eq(user2)
+        expect(@purgatory).to be_approved
+        expect(@purgatory).not_to be_pending
+        expect(Purgatory.pending.count).to be_zero
+        expect(Purgatory.approved.count).to eq(1)
+        expect(Purgatory.approved.first).to eq(@purgatory)
       end
 
       it "should store the id of the newly created object so the purgatory can be accessed through the object" do
         widget = Widget.first
-        widget.purgatories.count.should == 1
-        widget.purgatories.first.should == @purgatory 
+        expect(widget.purgatories.count).to eq(1)
+        expect(widget.purgatories.first).to eq(@purgatory)
       end
       
       it "should fail if you try to approve again" do
-        @purgatory.approve!(user2).should be false
+        expect(@purgatory.approve!(user2)).to be false
       end
     end
 
     context "approving new object creation using STI" do
       before do
         create_new_object_purgatory_with_sti
-        @purgatory.approve!(user2).should be true
+        expect(@purgatory.approve!(user2)).to be true
       end
       
       it "should create the new object and apply any callbacks" do
-        Dog.count.should == 1
+        expect(Dog.count).to eq(1)
         dog = Dog.first
-        dog.name.should == 'doggy'
-        dog.original_name.should == 'doggy'
-        dog.price.should == Dog::DEFAULT_PRICE
+        expect(dog.name).to eq('doggy')
+        expect(dog.original_name).to eq('doggy')
+        expect(dog.price).to eq(Dog::DEFAULT_PRICE)
       end
     end
 
@@ -347,37 +347,37 @@ describe Purgatory do
       end
 
       it "should create the new object and apply any callbacks" do
-        Item.count.should == 1
+        expect(Item.count).to eq(1)
         item = Item.first
-        item.name.should == 'foo'
-        item.price.should == 100
+        expect(item.name).to eq('foo')
+        expect(item.price).to eq(100)
       end
 
       it "should apply changes that depend on attr_accessor instance_variable" do
-        Item.first.original_name.should == 'inferno'
+        expect(Item.first.original_name).to eq('inferno')
       end
       
       it "should mark purgatory as approved and store approver" do
-        @purgatory.approver.should == user2
-        @purgatory.should be_approved
-        @purgatory.should_not be_pending            
-        Purgatory.pending.count.should be_zero
-        Purgatory.approved.count.should == 1
-        Purgatory.approved.first.should == @purgatory
+        expect(@purgatory.approver).to eq(user2)
+        expect(@purgatory).to be_approved
+        expect(@purgatory).not_to be_pending
+        expect(Purgatory.pending.count).to be_zero
+        expect(Purgatory.approved.count).to eq(1)
+        expect(Purgatory.approved.first).to eq(@purgatory)
       end
       
       it "should fail if you try to approve again" do
-        @purgatory.approve!(user2).should be false
+        expect(@purgatory.approve!(user2)).to be false
       end
     end
 
     context "approving method call purgatory" do
       before{create_method_call_purgatory}
       it "should call the method" do
-        @widget.name.should == 'foo'
+        expect(@widget.name).to eq('foo')
         @purgatory.approve!
         @widget.reload
-        @widget.name.should == 'bar'
+        expect(@widget.name).to eq('bar')
       end
     end
   end
@@ -393,7 +393,7 @@ describe Purgatory do
         it "should not store attr_accessors" do
           obj = @klass.new name: 'foo', price: 100, dante: "inferno"
           purgatory = obj.purgatory! user1
-          purgatory.attr_accessor_fields.should == {}
+          expect(purgatory.attr_accessor_fields).to eq({})
         end
       end
 
@@ -407,7 +407,7 @@ describe Purgatory do
           it "should work" do
             obj = @klass.new name: 'foo', price: 100, dante: "inferno"
             purgatory = obj.purgatory! user1
-            purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
+            expect(purgatory.attr_accessor_fields).to eq({ :@dante => "inferno" })
           end
         end
 
@@ -426,15 +426,15 @@ describe Purgatory do
           it "should work" do
             obj = @klass.new name: 'foo', price: 100, dante: "inferno"
             purgatory = obj.purgatory! user1
-            purgatory.attr_accessor_fields.should == { :@dante => "inferno" }
+            expect(purgatory.attr_accessor_fields).to eq({ :@dante => "inferno" })
 
             obj = @klass_2.new name: 'foo', price: 100, minos: "inferno"
             purgatory = obj.purgatory! user1
-            purgatory.attr_accessor_fields.should == { :@minos => "inferno" }
+            expect(purgatory.attr_accessor_fields).to eq({ :@minos => "inferno" })
 
             obj = @klass_3.new name: 'foo', price: 100
             purgatory = obj.purgatory! user1
-            purgatory.attr_accessor_fields.should == {}
+            expect(purgatory.attr_accessor_fields).to eq({})
           end
         end
       end
@@ -448,7 +448,7 @@ describe Purgatory do
       end
 
       it "should not contain any thing" do
-        AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == {}
+        expect(AttributeAccessorFields.determine_attr_accessor_fields(@obj)).to eq({})
       end
     end
 
@@ -466,7 +466,7 @@ describe Purgatory do
 
       context "local_attributes is empty" do
         it "should not contain any attr_accessor values" do
-          AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == {}
+          expect(AttributeAccessorFields.determine_attr_accessor_fields(@obj)).to eq({})
         end
       end
 
@@ -477,7 +477,7 @@ describe Purgatory do
           end
 
           it "should only contain attr_accessors specified in array" do
-            AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno" }
+            expect(AttributeAccessorFields.determine_attr_accessor_fields(@obj)).to eq({ :@dante => "inferno" })
           end
         end
         context "array size is more than 1" do
@@ -486,7 +486,7 @@ describe Purgatory do
           end
 
           it "should only contain attr_accessors specified in array" do
-            AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno" }
+            expect(AttributeAccessorFields.determine_attr_accessor_fields(@obj)).to eq({ :@dante => "inferno", :@minos => "inferno" })
           end
 
         end
@@ -498,7 +498,7 @@ describe Purgatory do
         end
 
         it "should automatically determine attr_accessor values that doesnt include ones belonging to AR::Base and its ancestors, and then store these values" do
-          AttributeAccessorFields.determine_attr_accessor_fields(@obj).should == { :@dante => "inferno", :@minos => "inferno", :@charon => "inferno" }
+          expect(AttributeAccessorFields.determine_attr_accessor_fields(@obj)).to eq({ :@dante => "inferno", :@minos => "inferno", :@charon => "inferno" })
         end
       end
     end
@@ -519,7 +519,7 @@ describe Purgatory do
       end
 
       it "should not include instance_variables that belong to ancestor of ActiveRecord::Base" do
-        ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == []
+        expect(ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget)).to eq([])
       end
     end
 
@@ -536,7 +536,7 @@ describe Purgatory do
       end
 
       it "should not include instance_variables that belong to ActiveRecord::Base" do
-        ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == []
+        expect(ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget)).to eq([])
       end
     end
 
@@ -552,7 +552,7 @@ describe Purgatory do
         end
         
         it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
-          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
+          expect(ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget)).to eq([:@dante])
         end
       end
 
@@ -568,7 +568,7 @@ describe Purgatory do
         end
         
         it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
-          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
+          expect(ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget)).to eq([:@dante])
         end
       end
 
@@ -582,7 +582,7 @@ describe Purgatory do
         end
         
         it "should include instance_variables from attr_accessors that belong to descendant of ActiveRecord::Base" do
-          ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget).should == [:@dante]
+          expect(ActiveRecordDescendantAttributeAccessors.attr_accessor_instance_variables(@widget)).to eq([:@dante])
         end
       end
     end
@@ -592,19 +592,19 @@ describe Purgatory do
           before {create_method_call_purgatory}
           
           it "should create and return pending Purgatory object" do
-            @purgatory.should be_present
-            @purgatory.should_not be_approved
-            @purgatory.should be_pending            
-            Purgatory.pending.count.should == 1
-            Purgatory.pending.first.should == @purgatory
-            Purgatory.approved.count.should be_zero            
+            expect(@purgatory).to be_present
+            expect(@purgatory).not_to be_approved
+            expect(@purgatory).to be_pending
+            expect(Purgatory.pending.count).to eq(1)
+            expect(Purgatory.pending.first).to eq(@purgatory)
+            expect(Purgatory.approved.count).to be_zero
           end
       
           it "should store the soul, requester and performable_method" do
-            @purgatory.soul.should == @widget
-            @purgatory.requester.should == user1
-            @purgatory.performable_method[:method].should == :rename
-            @purgatory.performable_method[:args].should == ['bar']
+            expect(@purgatory.soul).to eq(@widget)
+            expect(@purgatory.requester).to eq(user1)
+            expect(@purgatory.performable_method[:method]).to eq(:rename)
+            expect(@purgatory.performable_method[:args]).to eq(['bar'])
           end
           
           it "should delete old pending purgatories with same soul" do
@@ -613,26 +613,26 @@ describe Purgatory do
             widget2_purgatory = @widget2.purgatize(user1).rename('bar')
             @widget.name = 'baz'
             new_purgatory = @widget.purgatize(user1).rename('bar')
-            Purgatory.find_by_id(@purgatory.id).should be_nil
-            Purgatory.find_by_id(widget2_purgatory.id).should be_present
-            Purgatory.pending.count.should == 2
-            Purgatory.last.requested_changes['name'].should == ['foo', 'baz'] 
+            expect(Purgatory.find_by_id(@purgatory.id)).to be_nil
+            expect(Purgatory.find_by_id(widget2_purgatory.id)).to be_present
+            expect(Purgatory.pending.count).to eq(2)
+            expect(Purgatory.last.requested_changes['name']).to eq(['foo', 'baz'])
           end
 
           it "should fail to create purgatory if matching pending Purgatory exists and fail_if_matching_soul is passed in" do
             @widget.name = 'baz'
             new_purgatory = @widget.purgatize(user1, fail_if_matching_soul: true).rename('bar')
-            new_purgatory.should be_nil
-            Purgatory.find_by_id(@purgatory.id).should be_present
-            Purgatory.pending.count.should == 1
+            expect(new_purgatory).to be_nil
+            expect(Purgatory.find_by_id(@purgatory.id)).to be_present
+            expect(Purgatory.pending.count).to eq(1)
           end
 
           it "should succeed to create purgatory if matching approved Purgatory exists and fail_if_matching_soul is passed in" do
             @purgatory.approve!
             @widget.name = 'baz'
             new_purgatory = @widget.purgatize(user1, fail_if_matching_soul: true).rename('bar')
-            new_purgatory.should be_present
-            Purgatory.count.should == 2
+            expect(new_purgatory).to be_present
+            expect(Purgatory.count).to eq(2)
           end
         end
       end
