@@ -1,9 +1,9 @@
 require 'active_record'
-require 'generators/purgatory/templates/create_purgatories'
-require 'generators/purgatory/templates/add_performable_method_to_purgatories'
 require 'purgatory/purgatory_module'
 
 ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+
+ActiveRecord.use_yaml_unsafe_load = true
 
 ActiveRecord::Migration.create_table :widgets do |t|
   t.string :name
@@ -31,8 +31,21 @@ ActiveRecord::Migration.create_table :items do |t|
   t.timestamps
 end
 
-CreatePurgatories.new.migrate(:up)
-AddPerformableMethodToPurgatories.new.migrate(:up)
+ActiveRecord::Migration.create_table :purgatories do |t|
+    t.integer :soul_id
+    t.string :soul_type
+    t.integer :requester_id
+    t.integer :approver_id
+    t.datetime :approved_at
+    t.text :requested_changes
+    t.text :attr_accessor_fields
+    t.text :performable_method
+    t.timestamps
+
+    t.index [:soul_id, :soul_type]
+    t.index :requester_id
+    t.index :approver_id
+end
 
 PurgatoryModule.configure do |config|
   config.user_class_name = 'User'
