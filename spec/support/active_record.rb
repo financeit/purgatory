@@ -5,8 +5,15 @@ ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
 
 ActiveRecord.use_yaml_unsafe_load = true
 
+ActiveRecord::Encryption.configure(
+  primary_key: 'abc123',
+  deterministic_key: 'def456',
+  key_derivation_salt: 'ghi789',
+)
+
 ActiveRecord::Migration.create_table :widgets do |t|
   t.string :name
+  t.string :token, limit: 510
   t.integer :price
   t.string :original_name 
   t.timestamps
